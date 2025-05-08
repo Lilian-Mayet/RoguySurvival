@@ -4,19 +4,16 @@ using UnityEngine.Tilemaps;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float moveSpeed = 5f; // Vitesse de déplacement en unités mondiales par seconde
-    public float collisionSkinWidth = 0.02f; // Petite marge pour éviter de se coincer avec BoxCast
+    public float moveSpeed = 5f;
+    public float collisionSkinWidth = 0.02f;
 
     [Header("References")]
-    public MapGeneratorV2 mapGenerator; // Assignez dans l'Inspecteur
+    public MapGeneratorV2 mapGenerator;
 
     private Rigidbody2D rb;
     private Vector2 movementInput;
-    private Vector3Int currentLogicalTile;  // La tuile sur laquelle le joueur est logiquement (centre)
-    private int currentPlayerElevation = 0; // 0 pour base, 1 pour plateau/pont
-    private bool isMovingBetweenTiles = false; // Si le joueur est en transition entre les centres de tuiles
-    private Vector3 targetWorldPositionForLerp; // Position mondiale cible pour l'interpolation
-    private int pendingElevationOnArrival; // Utilisé pour stocker l'élévation cible pendant le lerp
+    private Vector3Int currentLogicalTile;
+    private int currentPlayerElevation = 0;
 
     [Header("Spawning")]
     public Vector2Int initialSpawnTileGuess = new Vector2Int(100, 100);
@@ -24,7 +21,6 @@ public class PlayerMovement : MonoBehaviour
 
     public LayerMask wallCollisionLayerMask;
     private Collider2D playerCollider;
-
 
     void Start()
     {
@@ -49,14 +45,11 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.LogError("COULD NOT FIND VALID SPAWN POSITION.");
             currentLogicalTile = new Vector3Int(mapGenerator.mapWidth / 2, mapGenerator.mapHeight / 2, 0);
-            if (mapGenerator.ElevationData != null && IsTileWithinBounds(currentLogicalTile.x, currentLogicalTile.y))
-                currentPlayerElevation = mapGenerator.ElevationData[currentLogicalTile.x, currentLogicalTile.y];
-            else
-                currentPlayerElevation = 0;
+            currentPlayerElevation = IsTileWithinBounds(currentLogicalTile.x, currentLogicalTile.y) ? mapGenerator.ElevationData[currentLogicalTile.x, currentLogicalTile.y] : 0;
         }
         transform.position = mapGenerator.groundLayer.GetCellCenterWorld(currentLogicalTile);
-        targetWorldPositionForLerp = transform.position;
-        pendingElevationOnArrival = currentPlayerElevation; // Initialisation
+        // Make sure currentLogicalTile is updated immediately after setting position
+        currentLogicalTile = mapGenerator.groundLayer.WorldToCell(transform.position);
         Debug.Log($"Player spawned at tile: {currentLogicalTile}, Elevation: {currentPlayerElevation}");
     }
 
@@ -64,25 +57,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (mapGenerator == null || mapGenerator.ElevationData == null) return;
         HandleInput();
-
-        if (!isMovingBetweenTiles)
-        {
-            TryInitiateMove();
-        }
     }
 
     void FixedUpdate()
     {
         if (mapGenerator == null || mapGenerator.ElevationData == null) return;
-
-        if (isMovingBetweenTiles)
-        {
-            PerformInterpolatedMove();
-        }
-        else
-        {
-            ApplyContinuousMovement();
-        }
+        ApplyContinuousMovement();
     }
 
     void HandleInput()
@@ -99,219 +79,343 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void TryInitiateMove()
-    {
-        if (movementInput == Vector2.zero) return;
-
-        Vector3Int nextIntentTile = currentLogicalTile;
-        if (Mathf.Abs(movementInput.x) > Mathf.Abs(movementInput.y))
-        {
-            nextIntentTile.x += (movementInput.x > 0) ? 1 : -1;
-        }
-        else
-        {
-            nextIntentTile.y += (movementInput.y > 0) ? 1 : -1;
-        }
-
-        if (nextIntentTile != currentLogicalTile)
-        {
-            if (CanLogicallyMoveToTile(nextIntentTile, out int newElevationForNextTile))
-            {
-                targetWorldPositionForLerp = mapGenerator.groundLayer.GetCellCenterWorld(nextIntentTile);
-                isMovingBetweenTiles = true;
-                pendingElevationOnArrival = newElevationForNextTile; // CORRECTION BUG 3: Stocker l'élévation cible
-            }
-        }
-    }
-
-    void PerformInterpolatedMove()
-    {
-        Vector3 newPos = Vector3.MoveTowards(rb.position, targetWorldPositionForLerp, moveSpeed * Time.fixedDeltaTime);
-        rb.MovePosition(newPos);
-
-        if (Vector3.Distance(rb.position, targetWorldPositionForLerp) < 0.05f)
-        {
-            rb.MovePosition(targetWorldPositionForLerp);
-            isMovingBetweenTiles = false;
-
-            currentLogicalTile = mapGenerator.groundLayer.WorldToCell(targetWorldPositionForLerp);
-            currentPlayerElevation = pendingElevationOnArrival; // CORRECTION BUG 3: Appliquer l'élévation stockée
-            // Debug.Log($"Arrived at tile: {currentLogicalTile}, New Elevation: {currentPlayerElevation}");
-        }
-    }
-
     void ApplyContinuousMovement()
     {
-        if (movementInput == Vector2.zero) return;
+        if (movementInput == Vector2.zero && rb.linearVelocity == Vector2.zero)
+        {
+            if (rb.bodyType == RigidbodyType2D.Kinematic) rb.linearVelocity = Vector2.zero;
+            return;
+        }
 
-        Vector2 currentPos = rb.position;
+        Vector2 currentPosition = rb.position;
+        Vector3Int previousLogicalTile = currentLogicalTile; // Store before any movement or evaluation
+        int previousPlayerElevation = currentPlayerElevation;
+
         Vector2 moveDelta = movementInput * moveSpeed * Time.fixedDeltaTime;
-        
-        // CORRECTION BUG 1: Utilisation de BoxCast pour une meilleure détection de collision
-        Vector2 boxCastSize = playerCollider.bounds.size * 0.95f; // Légèrement plus petit pour éviter de se coincer sur des bords parfaits
-        
-        RaycastHit2D hit = Physics2D.BoxCast(
-            currentPos,
-            boxCastSize,
-            0f,
-            movementInput.normalized, // Direction normalisée du mouvement
-            moveDelta.magnitude,      // Distance à parcourir ce frame
+        Vector2 intendedTargetPosition = currentPosition + moveDelta;
+
+        // 1. Physical Collision (BoxCast for walls)
+        Vector2 boxCastSize = playerCollider.bounds.size * 0.95f;
+        RaycastHit2D physicalHit = Physics2D.BoxCast(
+            currentPosition, boxCastSize, 0f,
+            movementInput.normalized, moveDelta.magnitude,
             wallCollisionLayerMask
         );
 
-        Vector2 targetPos;
-
-        if (hit.collider != null) // Collision physique détectée par BoxCast
+        Vector2 actualTargetPosition = intendedTargetPosition;
+        if (physicalHit.collider != null)
         {
-            // Se déplacer seulement jusqu'à la collision, moins une petite marge (skin width)
-            float distanceToHit = Mathf.Max(0, hit.distance - collisionSkinWidth);
-            targetPos = currentPos + movementInput.normalized * distanceToHit;
-            // Debug.Log($"Blocked by physical wall via BoxCast. Moving {distanceToHit} of {moveDelta.magnitude}");
-        }
-        else // Pas de mur physique détecté par BoxCast
-        {
-            targetPos = currentPos + moveDelta;
+            float distanceToHit = Mathf.Max(0, physicalHit.distance - collisionSkinWidth);
+            actualTargetPosition = currentPosition + movementInput.normalized * distanceToHit;
         }
 
-        // Vérification logique supplémentaire (falaise, etc.) si on change de tuile
-        Vector3Int tileAtPotentialTargetPos = mapGenerator.groundLayer.WorldToCell(targetPos);
-        if (tileAtPotentialTargetPos == currentLogicalTile || CanLogicallyMoveToTile(tileAtPotentialTargetPos, out int _))
+        // 2. Logical Validation and Elevation Changes
+        Vector3Int targetLogicalTileIfMoved = mapGenerator.groundLayer.WorldToCell(actualTargetPosition);
+        int newElevationForThisMove = currentPlayerElevation;
+        bool logicalMovementAllowed = true;
+
+        // --- Start Elevation Logic ---
+        // A. Check for STAIR TRANSITIONS (up/down) if potentially moving to a new tile
+        if (targetLogicalTileIfMoved != previousLogicalTile)
         {
-            rb.MovePosition(targetPos);
+            if (TryHandleStairElevationTransition(previousLogicalTile, targetLogicalTileIfMoved, previousPlayerElevation, out int elevationAfterStairTransition))
+            {
+                newElevationForThisMove = elevationAfterStairTransition;
+                // This implies movement is allowed onto the stair for transition
+                // Debug.Log($"STAIR TRANSITION: From {previousLogicalTile} (Elev {previousPlayerElevation}) to {targetLogicalTileIfMoved}. New Elev For Move: {newElevationForThisMove}");
+            }
+            // B. If not a stair transition, or even if it was, check general logical movement rules
+            //    IsGeneralMovementLogicallyAllowed will use the (potentially updated) newElevationForThisMove
+            else if (!IsGeneralMovementLogicallyAllowed(previousLogicalTile, targetLogicalTileIfMoved, newElevationForThisMove, out newElevationForThisMove))
+            {
+                logicalMovementAllowed = false;
+                // Debug.Log($"General movement BLOCKED from {previousLogicalTile} to {targetLogicalTileIfMoved} with starting elev {previousPlayerElevation}. Proposed elev after check {newElevationForThisMove}");
+            }
+        }
+        else // Staying within the same logical tile
+        {
+            if (!IsGeneralMovementLogicallyAllowed(previousLogicalTile, targetLogicalTileIfMoved, newElevationForThisMove, out newElevationForThisMove))
+            {
+                logicalMovementAllowed = false;
+                 // Debug.Log($"Movement within {previousLogicalTile} BLOCKED. Starting elev {previousPlayerElevation}. Proposed elev after check {newElevationForThisMove}");
+            }
+        }
+        // --- End Elevation Logic ---
+
+
+        // 3. Apply Movement or Slide
+        if (logicalMovementAllowed)
+        {
+            rb.MovePosition(actualTargetPosition);
+            currentPlayerElevation = newElevationForThisMove;
         }
         else
         {
-            // Bloqué par la logique de grille (falaise, etc.), on ne bouge pas plus loin dans cette direction
-            // On pourrait essayer de glisser le long du bord de la tuile actuelle.
-            // Pour l'instant, on s'assure de ne pas dépasser les limites logiques si BoxCast n'a rien trouvé
-            // (par exemple, si wallCollisionLayerMask n'est pas sur les tuiles de falaise)
-            // Essayer de bouger le long de l'axe autorisé si un seul est bloqué logiquement.
-            // Ceci est une simplification, un vrai "slide" serait plus complexe.
-            if (hit.collider == null) // Seulement si pas déjà bloqué par un mur physique
-            {
-                // Tenter de ne bouger que sur l'axe X si Y est bloqué logiquement, et vice-versa
-                Vector2 testPosX = currentPos + new Vector2(moveDelta.x, 0);
-                Vector3Int tileAtTestPosX = mapGenerator.groundLayer.WorldToCell(testPosX);
-                if (tileAtTestPosX == currentLogicalTile || CanLogicallyMoveToTile(tileAtTestPosX, out int _))
-                {
-                    rb.MovePosition(testPosX);
-                    return;
-                }
+            Vector2 slidePosition = TrySlide(currentPosition, movementInput.normalized, moveDelta.magnitude, previousPlayerElevation, previousLogicalTile);
+            Vector3Int slideTargetLogicalTile = mapGenerator.groundLayer.WorldToCell(slidePosition);
+            int slideNewPotentialElevation = previousPlayerElevation;
+            bool slideAllowed = false;
 
-                Vector2 testPosY = currentPos + new Vector2(0, moveDelta.y);
-                Vector3Int tileAtTestPosY = mapGenerator.groundLayer.WorldToCell(testPosY);
-                 if (tileAtTestPosY == currentLogicalTile || CanLogicallyMoveToTile(tileAtTestPosY, out int _))
+            if ((slidePosition - currentPosition).sqrMagnitude > 0.0001f) // If slide actually moved us
+            {
+                if (slideTargetLogicalTile != previousLogicalTile)
                 {
-                    rb.MovePosition(testPosY);
-                    return;
+                    if (TryHandleStairElevationTransition(previousLogicalTile, slideTargetLogicalTile, previousPlayerElevation, out int elevationAfterSlideStair))
+                    {
+                        slideNewPotentialElevation = elevationAfterSlideStair;
+                        slideAllowed = true;
+                    }
+                    else if (IsGeneralMovementLogicallyAllowed(previousLogicalTile, slideTargetLogicalTile, previousPlayerElevation, out slideNewPotentialElevation)) // Pass previousPlayerElevation here
+                    {
+                        slideAllowed = true;
+                    }
+                }
+                else // Slide kept us on the same tile
+                {
+                    if (IsGeneralMovementLogicallyAllowed(previousLogicalTile, slideTargetLogicalTile, previousPlayerElevation, out slideNewPotentialElevation)) // Pass previousPlayerElevation
+                    {
+                        slideAllowed = true;
+                    }
                 }
             }
-        }
-    }
 
-    bool CanLogicallyMoveToTile(Vector3Int targetLogicalTile, out int newElevation)
-    {
-        newElevation = currentPlayerElevation;
-
-        if (!IsTileWithinBounds(targetLogicalTile.x, targetLogicalTile.y)) return false;
-
-        TileBase groundTileAtTarget = mapGenerator.groundLayer.GetTile(targetLogicalTile);
-        TileBase stairsTileAtTarget = mapGenerator.stairsLayer.GetTile(targetLogicalTile);
-        TileBase bridgeTileAtTarget = (mapGenerator.bridgeLayer != null) ? mapGenerator.bridgeLayer.GetTile(targetLogicalTile) : null;
-        TileBase wallTileAtTarget = mapGenerator.wallsLayer.GetTile(targetLogicalTile); // Peut être null
-
-        int targetTileActualElevationData = mapGenerator.ElevationData[targetLogicalTile.x, targetLogicalTile.y];
-
-        // --- Interaction avec les Escaliers ---
-        if (stairsTileAtTarget != null)
-        {
-            if (currentPlayerElevation == 0 && targetTileActualElevationData == 0) // Tente de MONTER
+            if (slideAllowed)
             {
-                Vector3Int platformAboveStairPos = new Vector3Int(targetLogicalTile.x, targetLogicalTile.y + 1, 0); // Pour stair_S
-                if (IsTileWithinBounds(platformAboveStairPos.x, platformAboveStairPos.y) &&
-                    mapGenerator.ElevationData[platformAboveStairPos.x, platformAboveStairPos.y] == 1)
-                {
-                    newElevation = 1;
-                    return true;
-                }
-            }
-            else if (currentPlayerElevation == 1 && targetTileActualElevationData == 0) // Tente de DESCENDRE
-            {
-                if (currentLogicalTile.x == targetLogicalTile.x && currentLogicalTile.y == targetLogicalTile.y + 1) // Pour stair_S
-                {
-                    newElevation = 0;
-                    return true;
-                }
-            }
-            // Si on est déjà sur l'escalier et qu'on veut juste actualiser l'élévation (cas géré par pendingElevationOnArrival)
-            // ou si l'interaction d'escalier n'est pas valide pour un *déplacement*
-            // Debug.Log($"Stair interaction invalid or re-eval at {targetLogicalTile}. CurrentElev: {currentPlayerElevation}, TargetElevData: {targetTileActualElevationData}");
-            return false; // Bloque si c'est une interaction d'escalier non valide pour un mouvement
-        }
-
-        // CORRECTION BUG 2: Vérification des ponts AVANT les murs pour le cas où un pont passe au-dessus d'un mur.
-        // --- Interaction avec les Ponts ---
-        if (bridgeTileAtTarget != null)
-        {
-            if (currentPlayerElevation == 1) // Le joueur est au Niveau 1, il peut marcher sur le pont.
-            {
-                newElevation = 1;
-                return true; // Le pont est praticable au Niveau 1, peu importe ce qu'il y a dessous
-            }
-            else // currentPlayerElevation == 0. Le joueur est en dessous du pont.
-            {
-                // Le pont lui-même ne bloque pas. Vérifier si un MUR est SOUS le pont.
-                if (wallTileAtTarget == mapGenerator.cliffWall_S) // Assumant que cliffWall_S est votre tuile de mur spécifique
-                {
-                    // Debug.Log($"Blocked by wall under bridge at {targetLogicalTile}");
-                    return false; // Mur sous le pont, joueur au sol = bloqué
-                }
-                // Sinon, vérifier si le SOL SOUS le pont est praticable.
-                if (groundTileAtTarget != null && targetTileActualElevationData == 0)
-                {
-                    newElevation = 0;
-                    return true;
-                }
-                else
-                {
-                    // Debug.Log($"Blocked: No ground under bridge or mismatch elev at {targetLogicalTile}");
-                    return false;
-                }
-            }
-        }
-
-        // --- Vérification des Murs (si pas d'escalier ni de pont géré activement) ---
-        if (wallTileAtTarget == mapGenerator.cliffWall_S) // Assumant que cliffWall_S est votre tuile de mur spécifique
-        {
-            // Debug.Log($"Blocked by wall at {targetLogicalTile}");
-            return false;
-        }
-
-        // --- Mouvement sur Sol Normal / Gestion des Falaises ---
-        if (targetTileActualElevationData == currentPlayerElevation)
-        {
-            if (groundTileAtTarget != null)
-            {
-                return true;
+                rb.MovePosition(slidePosition);
+                currentPlayerElevation = slideNewPotentialElevation;
             }
             else
             {
-                // Debug.Log($"Blocked: Target tile at same elevation {targetLogicalTile} has no ground tile.");
-                return false;
+                if (physicalHit.collider != null) {
+                    rb.MovePosition(actualTargetPosition); // Move up to physical wall
+                } else {
+                    rb.MovePosition(currentPosition); // No movement
+                }
+                // currentPlayerElevation remains previousPlayerElevation
             }
         }
-        else if (Mathf.Abs(targetTileActualElevationData - currentPlayerElevation) == 1) // Différence d'élévation de 1
+        currentLogicalTile = mapGenerator.groundLayer.WorldToCell(rb.position);
+    }
+
+    // Handles elevation changes when moving ONTO a stair tile that initiates a climb/descent.
+    bool TryHandleStairElevationTransition(Vector3Int fromTile, Vector3Int toTile, int currentActualPlayerElev, out int newPlayerElevationOnStair)
+    {
+        newPlayerElevationOnStair = currentActualPlayerElev;
+
+        TileBase stairsOnToTile = mapGenerator.stairsLayer.GetTile(toTile);
+        if (stairsOnToTile == null) return false;
+
+        int toTileActualElevationData = mapGenerator.ElevationData[toTile.x, toTile.y];
+
+        // CLIMBING UP: Player at L0, moving from L0 ground ('fromTile') onto an L0 stair tile ('toTile')
+        if (currentActualPlayerElev == 0 && toTileActualElevationData == 0)
         {
-            // C'est une falaise (escaliers et ponts déjà gérés)
-            // Debug.Log($"Blocked: Cliff interaction from L{currentPlayerElevation} to L{targetTileActualElevationData} at {targetLogicalTile}");
-            return false;
+            Vector3Int platformAboveStairPos = new Vector3Int(toTile.x, toTile.y + 1, 0); // For stair_S
+            if (IsTileWithinBounds(platformAboveStairPos.x, platformAboveStairPos.y) &&
+                mapGenerator.ElevationData[platformAboveStairPos.x, platformAboveStairPos.y] == 1)
+            {
+                newPlayerElevationOnStair = 1;
+                return true;
+            }
         }
-        
-        // Debug.Log($"Blocked: Default fall-through or unhandled elevation diff at {targetLogicalTile}. CurrentElev: {currentPlayerElevation}, TargetActualElev: {targetTileActualElevationData}");
+        // DESCENDING: Player at L1, moving from L1 platform ('fromTile') onto an L0 stair tile ('toTile')
+        else if (currentActualPlayerElev == 1 && toTileActualElevationData == 0)
+        {
+            // fromTile must be the L1 platform connected to the stair 'toTile'
+            if (fromTile.x == toTile.x && fromTile.y == toTile.y + 1 && // For stair_S
+                IsTileWithinBounds(fromTile.x, fromTile.y) && mapGenerator.ElevationData[fromTile.x, fromTile.y] == 1)
+            {
+                newPlayerElevationOnStair = 0;
+                return true;
+            }
+        }
         return false;
     }
 
-    // --- Fonctions de Spawn (inchangées) ---
+    // Checks general movement rules.
+    // 'currentTilePlayerIsOn' is the tile the player is starting from for this check.
+    // 'targetTilePlayerMovesTo' is the tile they intend to enter.
+    // 'elevationPlayerWouldHave' is the player's elevation *if this move were to occur* (could be affected by TryHandleStairElevationTransition).
+    // 'finalPlayerElevationIfAllowed' is the elevation player will have if this function returns true.
+    bool IsGeneralMovementLogicallyAllowed(Vector3Int currentTilePlayerIsOn, Vector3Int targetTilePlayerMovesTo, int elevationPlayerWouldHave, out int finalPlayerElevationIfAllowed)
+    {
+        finalPlayerElevationIfAllowed = elevationPlayerWouldHave;
+
+        if (!IsTileWithinBounds(targetTilePlayerMovesTo.x, targetTilePlayerMovesTo.y)) return false;
+
+        TileBase groundOnTarget = mapGenerator.groundLayer.GetTile(targetTilePlayerMovesTo);
+        TileBase stairsOnTarget = mapGenerator.stairsLayer.GetTile(targetTilePlayerMovesTo);
+        TileBase bridgeOnTarget = (mapGenerator.bridgeLayer != null) ? mapGenerator.bridgeLayer.GetTile(targetTilePlayerMovesTo) : null;
+        TileBase wallOnTarget = mapGenerator.wallsLayer.GetTile(targetTilePlayerMovesTo);
+
+        int targetTileDataElev = mapGenerator.ElevationData[targetTilePlayerMovesTo.x, targetTilePlayerMovesTo.y];
+
+        // --- CORRECTION FOR BRIDGES OVER WALLS ---
+        // 1. BRIDGE LOGIC (Highest Priority if player is at L1 or would be at L1)
+        if (bridgeOnTarget != null)
+        {
+            if (elevationPlayerWouldHave == 1)
+            {
+                finalPlayerElevationIfAllowed = 1; // Stay/move onto bridge at L1
+                // Debug.Log($"Bridge: Allowed on bridge {targetTilePlayerMovesTo} at Elev 1.");
+                return true; // Allowed on bridge at L1, overrides walls below.
+            }
+            else // Player is L0 (or would be L0) and target has a bridge (meaning player is under it)
+            {
+                if (wallOnTarget == mapGenerator.cliffWall_S) { /*Debug.Log($"Bridge: Blocked by wall under bridge at {targetTilePlayerMovesTo}.");*/ return false; }
+                if (groundOnTarget != null && targetTileDataElev == 0)
+                {
+                    finalPlayerElevationIfAllowed = 0; // On ground under bridge
+                    // Debug.Log($"Bridge: Allowed on ground under bridge {targetTilePlayerMovesTo} at Elev 0.");
+                    return true;
+                }
+                // Debug.Log($"Bridge: Blocked under bridge at {targetTilePlayerMovesTo} (no ground or wrong elev data).");
+                return false; // No ground or non-L0 ground under bridge
+            }
+        }
+
+        // --- CORRECTION FOR STAIRS (Staying on, or stepping off) ---
+        // This logic assumes TryHandleStairElevationTransition already handled the *initial* step onto a stair that changes elevation.
+        // Now we handle moving along a stair, or stepping OFF a stair.
+        TileBase stairsOnCurrentTile = mapGenerator.stairsLayer.GetTile(currentTilePlayerIsOn);
+
+        if (stairsOnTarget != null) // Moving TO another stair tile (or staying on the same one if target==current)
+        {
+            // Player is L1 (conceptually on upper part of stair), target stair tile itself is L0 data
+            if (elevationPlayerWouldHave == 1 && targetTileDataElev == 0)
+            {
+                finalPlayerElevationIfAllowed = 1; return true;
+            }
+            // Player is L0 (conceptually on lower part of stair), target stair tile itself is L0 data
+            else if (elevationPlayerWouldHave == 0 && targetTileDataElev == 0)
+            {
+                finalPlayerElevationIfAllowed = 0; return true;
+            }
+            // Player is L1, target stair is L1 data (e.g. decorative stair on plateau)
+             else if (elevationPlayerWouldHave == 1 && targetTileDataElev == 1)
+            {
+                finalPlayerElevationIfAllowed = 1; return true;
+            }
+            // Debug.Log($"Stairs: Blocked on stair {targetTilePlayerMovesTo}. PlayerElevWouldBe: {elevationPlayerWouldHave}, TargetDataElev: {targetTileDataElev}");
+            return false; // Other stair configurations might be invalid
+        }
+        // Moving OFF a stair
+        else if (stairsOnCurrentTile != null) // Player is currently on a stair tile, target is NOT a stair
+        {
+            // Stepping off the "top" of a stair (player L1 on an L0 data stair) onto L0 ground
+            if (elevationPlayerWouldHave == 1 && mapGenerator.ElevationData[currentTilePlayerIsOn.x, currentTilePlayerIsOn.y] == 0 &&
+                groundOnTarget != null && targetTileDataElev == 0 && wallOnTarget == null)
+            {
+                finalPlayerElevationIfAllowed = 0; // Land on L0 ground
+                // Debug.Log($"Stairs: Stepping OFF L1 stair {currentTilePlayerIsOn} to L0 ground {targetTilePlayerMovesTo}.");
+                return true;
+            }
+            // Stepping off the "bottom" of a stair (player L0 on an L0 data stair) onto L1 platform (unusual without target being a stair itself, but handle for completeness)
+            else if (elevationPlayerWouldHave == 0 && mapGenerator.ElevationData[currentTilePlayerIsOn.x, currentTilePlayerIsOn.y] == 0 &&
+                     groundOnTarget != null && targetTileDataElev == 1 && wallOnTarget == null) // Assuming platform is groundLayer
+            {
+                finalPlayerElevationIfAllowed = 1; // Land on L1 platform
+                 // Debug.Log($"Stairs: Stepping OFF L0 stair {currentTilePlayerIsOn} to L1 platform {targetTilePlayerMovesTo}.");
+                return true;
+            }
+            // Stepping off a stair onto same-level ground/platform
+            else if (targetTileDataElev == elevationPlayerWouldHave && groundOnTarget != null && wallOnTarget == null)
+            {
+                // finalPlayerElevationIfAllowed is already elevationPlayerWouldHave
+                // Debug.Log($"Stairs: Stepping OFF stair {currentTilePlayerIsOn} to same level ({elevationPlayerWouldHave}) ground {targetTilePlayerMovesTo}.");
+                return true;
+            }
+            // Debug.Log($"Stairs: Blocked stepping OFF stair {currentTilePlayerIsOn} to {targetTilePlayerMovesTo}. PlayerElevWouldBe: {elevationPlayerWouldHave}, TargetDataElev: {targetTileDataElev}");
+            return false; // Block if stepping off stair to invalid location
+        }
+
+
+        // 3. WALLS (If not a bridge scenario that already returned true)
+        if (wallOnTarget == mapGenerator.cliffWall_S)
+        {
+            // Debug.Log($"Walls: Blocked by wall {targetTilePlayerMovesTo}.");
+            return false;
+        }
+
+        // 4. GROUND / CLIFFS (No bridge, no stair handled above, no wall on target tile)
+        if (targetTileDataElev == elevationPlayerWouldHave)
+        {
+            if (groundOnTarget != null)
+            {
+                // finalPlayerElevationIfAllowed is already elevationPlayerWouldHave
+                return true; // Valid ground at same elevation
+            }
+            // Debug.Log($"Ground/Cliff: Blocked - No ground tile at {targetTilePlayerMovesTo} (elev {elevationPlayerWouldHave}).");
+            return false; // Empty space even if elevation matches
+        }
+        else // Elevation mismatch = cliff (and not handled by stair logic)
+        {
+            // Debug.Log($"Ground/Cliff: Blocked - Cliff at {targetTilePlayerMovesTo}. PlayerElevWouldBe {elevationPlayerWouldHave}, TargetDataElev {targetTileDataElev}.");
+            return false;
+        }
+    }
+
+    Vector2 TrySlide(Vector2 currentPosition, Vector2 normalizedInput, float moveDistance, int playerElevationBeforeSlide, Vector3Int playerTileBeforeSlide)
+    {
+        Vector2 bestSlidePosition = currentPosition;
+
+        // Try X-only movement
+        if (Mathf.Abs(normalizedInput.x) > 0.01f)
+        {
+            Vector2 xOnlyDirection = new Vector2(normalizedInput.x, 0).normalized;
+            Vector2 xPotentialTargetPos = currentPosition + xOnlyDirection * moveDistance;
+            RaycastHit2D xPhysicalHit = Physics2D.BoxCast(currentPosition, playerCollider.bounds.size * 0.95f, 0f, xOnlyDirection, moveDistance, wallCollisionLayerMask);
+            if (xPhysicalHit.collider != null) {
+                xPotentialTargetPos = currentPosition + xOnlyDirection * Mathf.Max(0, xPhysicalHit.distance - collisionSkinWidth);
+            }
+
+            Vector3Int xTargetTile = mapGenerator.groundLayer.WorldToCell(xPotentialTargetPos);
+            int xNewElev = playerElevationBeforeSlide; // Start with original elevation for this slide check
+            bool xSlideAllowed = false;
+
+            if (xTargetTile != playerTileBeforeSlide) {
+                if (TryHandleStairElevationTransition(playerTileBeforeSlide, xTargetTile, playerElevationBeforeSlide, out xNewElev) ||
+                    IsGeneralMovementLogicallyAllowed(playerTileBeforeSlide, xTargetTile, playerElevationBeforeSlide, out xNewElev)) { // Pass original elevation
+                    xSlideAllowed = true;
+                }
+            } else {
+                 if (IsGeneralMovementLogicallyAllowed(playerTileBeforeSlide, xTargetTile, playerElevationBeforeSlide, out xNewElev)) { // Pass original elevation
+                    xSlideAllowed = true;
+                 }
+            }
+            if (xSlideAllowed) return xPotentialTargetPos; // Prioritize X slide
+        }
+
+        // Try Y-only movement
+        if (Mathf.Abs(normalizedInput.y) > 0.01f)
+        {
+            Vector2 yOnlyDirection = new Vector2(0, normalizedInput.y).normalized;
+            Vector2 yPotentialTargetPos = currentPosition + yOnlyDirection * moveDistance;
+            RaycastHit2D yPhysicalHit = Physics2D.BoxCast(currentPosition, playerCollider.bounds.size * 0.95f, 0f, yOnlyDirection, moveDistance, wallCollisionLayerMask);
+            if (yPhysicalHit.collider != null) {
+                yPotentialTargetPos = currentPosition + yOnlyDirection * Mathf.Max(0, yPhysicalHit.distance - collisionSkinWidth);
+            }
+
+            Vector3Int yTargetTile = mapGenerator.groundLayer.WorldToCell(yPotentialTargetPos);
+            int yNewElev = playerElevationBeforeSlide;
+            bool ySlideAllowed = false;
+
+            if(yTargetTile != playerTileBeforeSlide){
+                if (TryHandleStairElevationTransition(playerTileBeforeSlide, yTargetTile, playerElevationBeforeSlide, out yNewElev) ||
+                    IsGeneralMovementLogicallyAllowed(playerTileBeforeSlide, yTargetTile, playerElevationBeforeSlide, out yNewElev)) {
+                    ySlideAllowed = true;
+                }
+            } else {
+                if(IsGeneralMovementLogicallyAllowed(playerTileBeforeSlide, yTargetTile, playerElevationBeforeSlide, out yNewElev)) {
+                    ySlideAllowed = true;
+                }
+            }
+            if (ySlideAllowed) return yPotentialTargetPos;
+        }
+        return bestSlidePosition; // No slide was possible
+    }
+
+    bool IsTileWithinBounds(int x, int y) { return x >= 0 && x < mapGenerator.mapWidth && y >= 0 && y < mapGenerator.mapHeight; }
     bool FindValidSpawnPosition(out Vector3Int foundPosition, out int foundElevation)
     {
         foundPosition = Vector3Int.zero; foundElevation = 0;
@@ -319,36 +423,32 @@ public class PlayerMovement : MonoBehaviour
         Vector3Int testPos = new Vector3Int(initialSpawnTileGuess.x, initialSpawnTileGuess.y, 0);
         if (IsSpawnCandidateValid(testPos, out foundElevation)) { foundPosition = testPos; return true; }
         for (int r = 1; r <= maxSpawnSearchRadius; r++) {
-            // Spiral search (simplified)
             for (int i = -r; i <= r; i++) {
-                testPos = new Vector3Int(initialSpawnTileGuess.x + i, initialSpawnTileGuess.y + r, 0); // Top
+                testPos = new Vector3Int(initialSpawnTileGuess.x + i, initialSpawnTileGuess.y + r, 0);
                 if (IsSpawnCandidateValid(testPos, out foundElevation)) { foundPosition = testPos; return true; }
-                testPos = new Vector3Int(initialSpawnTileGuess.x + i, initialSpawnTileGuess.y - r, 0); // Bottom
+                testPos = new Vector3Int(initialSpawnTileGuess.x + i, initialSpawnTileGuess.y - r, 0);
                 if (IsSpawnCandidateValid(testPos, out foundElevation)) { foundPosition = testPos; return true; }
             }
-            for (int i = -r + 1; i < r; i++) { // Avoid double-checking corners
-                testPos = new Vector3Int(initialSpawnTileGuess.x - r, initialSpawnTileGuess.y + i, 0); // Left
+            for (int i = -r + 1; i < r; i++) {
+                testPos = new Vector3Int(initialSpawnTileGuess.x - r, initialSpawnTileGuess.y + i, 0);
                 if (IsSpawnCandidateValid(testPos, out foundElevation)) { foundPosition = testPos; return true; }
-                testPos = new Vector3Int(initialSpawnTileGuess.x + r, initialSpawnTileGuess.y + i, 0); // Right
+                testPos = new Vector3Int(initialSpawnTileGuess.x + r, initialSpawnTileGuess.y + i, 0);
                 if (IsSpawnCandidateValid(testPos, out foundElevation)) { foundPosition = testPos; return true; }
             }
         }
         Debug.LogWarning($"No valid spawn within {maxSpawnSearchRadius} of {initialSpawnTileGuess}.");
         return false;
     }
-    bool IsTileWithinBounds(int x, int y) { return x >= 0 && x < mapGenerator.mapWidth && y >= 0 && y < mapGenerator.mapHeight; }
     bool IsSpawnCandidateValid(Vector3Int tilePos, out int elevation)
     {
         elevation = 0;
         if (!IsTileWithinBounds(tilePos.x, tilePos.y)) return false;
-        if (mapGenerator.groundLayer.GetTile(tilePos) == null) return false; // Must have ground
-        // Cannot spawn on walls, stairs, bridges, or deco
+        if (mapGenerator.groundLayer.GetTile(tilePos) == null) return false;
         if (mapGenerator.wallsLayer.GetTile(tilePos) != null ||
             mapGenerator.stairsLayer.GetTile(tilePos) != null ||
             (mapGenerator.bridgeLayer != null && mapGenerator.bridgeLayer.GetTile(tilePos) != null) ||
             (mapGenerator.decoLayer != null && mapGenerator.decoLayer.GetTile(tilePos) != null) ) return false;
-        
         elevation = mapGenerator.ElevationData[tilePos.x, tilePos.y];
-        return true; // Valid spawn point
+        return true;
     }
 }
