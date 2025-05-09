@@ -7,8 +7,10 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5f;
     public float collisionSkinWidth = 0.02f;
 
+
     [Header("References")]
     public MapGeneratorV2 mapGenerator;
+    public SpriteRenderer playerSpriteRenderer;
 
     private Rigidbody2D rb;
     private Vector2 movementInput;
@@ -27,6 +29,9 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 lastMovementDirection; // Pour se souvenir de la dernière direction
 
+
+    public int orderInLayerLevel0 = 5;
+    public int orderInLayerLevel1 = 7;
 
     void Start()
     {
@@ -219,6 +224,9 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         currentLogicalTile = mapGenerator.groundLayer.WorldToCell(rb.position);
+
+
+        UpdateSpriteOrderInLayer();
     }
 
 
@@ -254,6 +262,22 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("LastMoveX", lastMovementDirection.x);
         animator.SetFloat("LastMoveY", lastMovementDirection.y);
     }
+
+
+    void UpdateSpriteOrderInLayer()
+{
+    if (playerSpriteRenderer == null) return;
+
+    if (currentPlayerElevation == 0)
+    {
+        playerSpriteRenderer.sortingOrder = orderInLayerLevel0;
+    }
+    else if (currentPlayerElevation == 1)
+    {
+        playerSpriteRenderer.sortingOrder = orderInLayerLevel1;
+    }
+    // Vous pouvez ajouter d'autres else if pour plus de niveaux d'élévation si nécessaire
+}
 
     // Handles elevation changes when moving ONTO a stair tile that initiates a climb/descent.
     bool TryHandleStairElevationTransition(Vector3Int fromTile, Vector3Int toTile, int currentActualPlayerElev, out int newPlayerElevationOnStair)

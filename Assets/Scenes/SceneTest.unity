@@ -818,12 +818,15 @@ MonoBehaviour:
   moveSpeed: 5
   collisionSkinWidth: 0.02
   mapGenerator: {fileID: 638169458}
+  playerSpriteRenderer: {fileID: 1089949086}
   initialSpawnTileGuess: {x: 100, y: 100}
   maxSpawnSearchRadius: 20
   wallCollisionLayerMask:
     serializedVersion: 2
     m_Bits: 256
   animator: {fileID: 1089949089}
+  orderInLayerLevel0: 5
+  orderInLayerLevel1: 7
 --- !u!50 &1089949085
 Rigidbody2D:
   serializedVersion: 5
@@ -1088,7 +1091,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 6
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
