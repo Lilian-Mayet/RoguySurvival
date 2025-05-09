@@ -1,0 +1,15 @@
+{
+    "allWeapons": [
+      {
+        "weaponID": "iron_sword",
+        "itemName": "Iron Sword",
+        "weaponType": "Sword",
+        "damage": 10,
+        "attackSpeed": 1.2,
+        "weight": 5.0,
+        "description": "A sturdy sword made of iron.",
+        "iconSpriteName": "Iron_sword"
+      }
+      
+    ]
+  }
