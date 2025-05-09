@@ -288,6 +288,18 @@ MonoBehaviour:
     minClusterSize: 2
     maxClusterSize: 6
     clusterSpreadRadius: 3
+  - themeName: Garden
+    themeType: 3
+    smallTile: {fileID: 11400000, guid: cc77b8d377bc02f42a0bab5f51a49e69, type: 2}
+    mediumTile: {fileID: 11400000, guid: 1570810378a651f469b40ed95ed1392a, type: 2}
+    bigTile: {fileID: 11400000, guid: 1570810378a651f469b40ed95ed1392a, type: 2}
+    specialTiles:
+    - {fileID: 11400000, guid: 4128f6945c581fd40a897e50e0341a36, type: 2}
+    clusterStartChance: 0.0072
+    densityInCluster: 0.603
+    minClusterSize: 4
+    maxClusterSize: 10
+    clusterSpreadRadius: 3
 --- !u!1 &997883255
 GameObject:
   m_ObjectHideFlags: 0
@@ -403,7 +415,7 @@ TilemapCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 997883255}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -783,6 +795,7 @@ GameObject:
   - component: {fileID: 1089949085}
   - component: {fileID: 1089949084}
   - component: {fileID: 1089949088}
+  - component: {fileID: 1089949089}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -945,7 +958,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.78125, y: 1}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -953,6 +966,28 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.8, y: 0.8}
   m_EdgeRadius: 0
+--- !u!95 &1089949089
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089949083}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ab0a4eef664a81f4e80a348ea84185d1, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1141025277
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,7 +1525,7 @@ Transform:
   m_GameObject: {fileID: 1560993739}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -7}
+  m_LocalPosition: {x: 0, y: 0, z: -9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1602,7 +1637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 886251e9a18ece04ea8e61686c173e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraDistance: 7
+  CameraDistance: 9
   DeadZoneDepth: 0
   Composition:
     ScreenPosition: {x: 0, y: 0}
@@ -1673,7 +1708,7 @@ Transform:
   m_GameObject: {fileID: 1805595499}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -7}
+  m_LocalPosition: {x: 0, y: 0, z: -9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
