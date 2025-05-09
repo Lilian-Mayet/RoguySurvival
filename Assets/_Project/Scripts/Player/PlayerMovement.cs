@@ -22,6 +22,12 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask wallCollisionLayerMask;
     private Collider2D playerCollider;
 
+    [Header("Animation Settings")]
+    public Animator animator; // Faites glisser le composant Animator de votre joueur ici dans l'Inspecteur
+
+    private Vector2 lastMovementDirection; // Pour se souvenir de la dernière direction
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -51,17 +57,35 @@ public class PlayerMovement : MonoBehaviour
         // Make sure currentLogicalTile is updated immediately after setting position
         currentLogicalTile = mapGenerator.groundLayer.WorldToCell(transform.position);
         Debug.Log($"Player spawned at tile: {currentLogicalTile}, Elevation: {currentPlayerElevation}");
+
+
+
+
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>(); // Essayer de le récupérer si non assigné
+        }
+        if (animator == null)
+        {
+            Debug.LogError("Animator component not found on the player!");
+            enabled = false; // Désactiver le script si l'animator est manquant
+            return;
+        }
+        lastMovementDirection = new Vector2(0, -1); // Par défaut, regarde vers le bas
+        UpdateAnimatorParameters(Vector2.zero); // Initialiser l'animator
+
     }
 
     void Update()
     {
         if (mapGenerator == null || mapGenerator.ElevationData == null) return;
         HandleInput();
+        UpdateAnimatorParameters(movementInput); // Mettre à jour l'animator avant FixedUpdate
     }
 
     void FixedUpdate()
     {
-        if (mapGenerator == null || mapGenerator.ElevationData == null) return;
+        if (mapGenerator == null || mapGenerator.ElevationData == null || animator == null) return;
         ApplyContinuousMovement();
     }
 
@@ -195,6 +219,40 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         currentLogicalTile = mapGenerator.groundLayer.WorldToCell(rb.position);
+    }
+
+
+
+    void UpdateAnimatorParameters(Vector2 currentMoveInput)
+    {
+    
+        if (animator == null) return;
+
+        // Si le joueur bouge
+    
+        if (currentMoveInput.sqrMagnitude > 0.01f)
+        {
+            animator.SetBool("IsMoving", true);
+            animator.SetFloat("MoveX", currentMoveInput.x);
+            animator.SetFloat("MoveY", currentMoveInput.y);
+
+            // Mémoriser la dernière direction de mouvement pour l'idle
+            // Normaliser pour que LastMoveX/Y soient proches de -1, 0, ou 1
+            lastMovementDirection = currentMoveInput.normalized;
+        }
+        else // Le joueur est immobile
+        {
+            animator.SetBool("IsMoving", false);
+            // Optionnel: Mettre MoveX et MoveY à 0 si vous n'utilisez pas LastMoveX/Y pour l'idle
+            // animator.SetFloat("MoveX", 0);
+            // animator.SetFloat("MoveY", 0);
+        }
+
+        // Mettre à jour les paramètres pour la direction d'idle
+        // Ces valeurs seront utilisées par les transitions vers les états Idle
+        // lorsque IsMoving devient false.
+        animator.SetFloat("LastMoveX", lastMovementDirection.x);
+        animator.SetFloat("LastMoveY", lastMovementDirection.y);
     }
 
     // Handles elevation changes when moving ONTO a stair tile that initiates a climb/descent.
