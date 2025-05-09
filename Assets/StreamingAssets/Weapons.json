@@ -349,6 +349,896 @@
         "weight": 8.0,
         "description": "A surprisingly heavy hammer made from dense hardwood.",
         "iconSpriteName": "wood_heavy_hammer"
+      },
+      {
+        "weaponID": "sword_020_ancient_copper",
+        "itemName": "Ancient Copper Sword",
+        "weaponType": "Sword",
+        "damage": 12,
+        "attackSpeed": 1.1,
+        "weight": 4.5,
+        "description": "A copper sword, weathered by ages but still sharp.",
+        "iconSpriteName": "ancient_copper_sword"
+      },
+      {
+        "weaponID": "sword_021_ancient_crystal",
+        "itemName": "Ancient Crystal Sword",
+        "weaponType": "Sword",
+        "damage": 25,
+        "attackSpeed": 1.0,
+        "weight": 3.0,
+        "description": "Glows with a faint, ancient power. Surprisingly light.",
+        "iconSpriteName": "ancient_crystal_sword"
+      },
+      {
+        "weaponID": "sword_022_ancient_magic",
+        "itemName": "Ancient Magic Sword",
+        "weaponType": "Sword",
+        "damage": 28,
+        "attackSpeed": 1.05,
+        "weight": 4.0,
+        "description": "Imbued with forgotten enchantments from a bygone era.",
+        "iconSpriteName": "ancient_magic_sword"
+      },
+      {
+        "weaponID": "sword_023_ancient",
+        "itemName": "Ancient Sword",
+        "weaponType": "Sword",
+        "damage": 18,
+        "attackSpeed": 0.95,
+        "weight": 5.5,
+        "description": "A relic from a lost civilization, its history unknown.",
+        "iconSpriteName": "ancient_sword"
+      },
+      {
+        "weaponID": "sword_024_antique",
+        "itemName": "Antique Sword",
+        "weaponType": "Sword",
+        "damage": 15,
+        "attackSpeed": 1.0,
+        "weight": 5.0,
+        "description": "A well-preserved sword from a noble house of old.",
+        "iconSpriteName": "antique_sword"
+      },
+      {
+        "weaponID": "sword_025_big",
+        "itemName": "Big Sword",
+        "weaponType": "Sword",
+        "damage": 22,
+        "attackSpeed": 0.8,
+        "weight": 9.0,
+        "description": "It's big. Really big. And heavy.",
+        "iconSpriteName": "big_sword"
+      },
+      {
+        "weaponID": "sword_026_blue_hero",
+        "itemName": "Blue Hero's Sword",
+        "weaponType": "Sword",
+        "damage": 20,
+        "attackSpeed": 1.15,
+        "weight": 4.8,
+        "description": "The legendary blade of a hero clad in blue. Shines with courage.",
+        "iconSpriteName": "blue_hero_sword"
+      },
+      {
+        "weaponID": "sword_027_braising", // Vérifiez le nom: "braising" ou "blazing"/"branding"?
+        "itemName": "Braising Sword",
+        "weaponType": "Sword",
+        "damage": 19, // Dégâts de feu?
+        "attackSpeed": 1.0,
+        "weight": 5.2,
+        "description": "This sword seems to simmer with intense heat.",
+        "iconSpriteName": "braising_sword"
+      },
+      {
+        "weaponID": "sword_028_carbonating",
+        "itemName": "Carbonating Sword",
+        "weaponType": "Sword",
+        "damage": 16, // Dégâts de type acide ou gaz?
+        "attackSpeed": 1.2,
+        "weight": 4.0,
+        "description": "Effervescent energy crackles along its edge.",
+        "iconSpriteName": "carbonating_sword"
+      },
+      {
+        "weaponID": "sword_029_copper",
+        "itemName": "Copper Sword",
+        "weaponType": "Sword",
+        "damage": 10,
+        "attackSpeed": 1.0,
+        "weight": 5.0,
+        "description": "A basic, but reliable, copper sword.",
+        "iconSpriteName": "copper_sword"
+      },
+      {
+        "weaponID": "sword_030_cursed",
+        "itemName": "Cursed Sword",
+        "weaponType": "Sword",
+        "damage": 30, // Dégâts élevés, mais malus?
+        "attackSpeed": 0.9,
+        "weight": 6.0,
+        "description": "A wicked blade that thirsts for souls. Wield with caution.",
+        "iconSpriteName": "cursed_sword"
+      },
+      {
+        "weaponID": "saber_001_curved", // Changé weaponID pour refléter "saber"
+        "itemName": "Curved Saber",
+        "weaponType": "Sword", // Ou un nouveau type "Saber"
+        "damage": 17,
+        "attackSpeed": 1.25,
+        "weight": 4.2,
+        "description": "A gracefully curved saber, swift and deadly in skilled hands.",
+        "iconSpriteName": "curved_saber"
+      },
+      {
+        "weaponID": "sword_031_darker",
+        "itemName": "Darker Sword",
+        "weaponType": "Sword",
+        "damage": 24,
+        "attackSpeed": 0.95,
+        "weight": 6.5,
+        "description": "Even deeper shadows cling to this ominous blade.",
+        "iconSpriteName": "darker_sword"
+      },
+      {
+        "weaponID": "sword_032_dark",
+        "itemName": "Dark Sword",
+        "weaponType": "Sword",
+        "damage": 20,
+        "attackSpeed": 1.0,
+        "weight": 6.0,
+        "description": "Forged in darkness, this sword absorbs light around it.",
+        "iconSpriteName": "dark_sword"
+      },
+      {
+        "weaponID": "sword_033_dawn",
+        "itemName": "Dawn Sword",
+        "weaponType": "Sword",
+        "damage": 26, // Efficace contre les morts-vivants?
+        "attackSpeed": 1.1,
+        "weight": 5.0,
+        "description": "A blade that shines with the first light of dawn, banishing shadows.",
+        "iconSpriteName": "dawn_sword"
+      },
+      {
+        "weaponID": "sword_034_demonic",
+        "itemName": "Demonic Sword",
+        "weaponType": "Sword",
+        "damage": 33,
+        "attackSpeed": 0.85,
+        "weight": 7.0,
+        "description": "Pulsates with infernal energy. Its hunger is insatiable.",
+        "iconSpriteName": "demonic_sword"
+      },
+      {
+        "weaponID": "sword_035_diamond_dragon",
+        "itemName": "Diamond Dragon Sword",
+        "weaponType": "Sword",
+        "damage": 45,
+        "attackSpeed": 0.9,
+        "weight": 8.0,
+        "description": "An legendary sword crafted from a dragon's tooth and flawless diamonds.",
+        "iconSpriteName": "diamond_dragon_sword"
+      },
+      {
+        "weaponID": "foil_001_diamond", // Changé weaponID pour "foil"
+        "itemName": "Diamond Foil",
+        "weaponType": "Sword", // Ou un nouveau type "Foil" / "Rapier"
+        "damage": 18,
+        "attackSpeed": 1.4,
+        "weight": 2.5,
+        "description": "An exquisitely crafted dueling foil, tipped with a sharp diamond.",
+        "iconSpriteName": "diamond_foil"
+      },
+      {
+        "weaponID": "sword_036_diamond",
+        "itemName": "Diamond Sword",
+        "weaponType": "Sword",
+        "damage": 30,
+        "attackSpeed": 1.0,
+        "weight": 5.5,
+        "description": "A sword of incredible hardness and sharpness, forged with diamonds.",
+        "iconSpriteName": "diamond_sword"
+      },
+      {
+        "weaponID": "sword_037_electric_piercing",
+        "itemName": "Electric Piercing Sword",
+        "weaponType": "Sword",
+        "damage": 20, // Dégâts électriques? Bonus contre armure?
+        "attackSpeed": 1.15,
+        "weight": 4.7,
+        "description": "Designed to pierce armor, this blade also delivers a shocking jolt.",
+        "iconSpriteName": "electric_piercing_sword"
+      },
+      {
+        "weaponID": "sword_038_flaming",
+        "itemName": "Flaming Sword",
+        "weaponType": "Sword",
+        "damage": 22, // Dégâts de feu?
+        "attackSpeed": 1.0,
+        "weight": 5.8,
+        "description": "This sword is wreathed in magical, ever-burning flames.",
+        "iconSpriteName": "flaming_sword"
+      },
+      {
+        "weaponID": "sword_039_golden_dragon",
+        "itemName": "Golden Dragon Sword",
+        "weaponType": "Sword",
+        "damage": 40,
+        "attackSpeed": 0.95,
+        "weight": 8.5,
+        "description": "A majestic sword said to be blessed by a golden dragon.",
+        "iconSpriteName": "golden_dragon_sword"
+      },
+      {
+        "weaponID": "sword_040_golden_thin",
+        "itemName": "Golden Thin Sword",
+        "weaponType": "Sword",
+        "damage": 14,
+        "attackSpeed": 1.3,
+        "weight": 3.5,
+        "description": "A slender, ornate sword made of gold. More decorative than practical.",
+        "iconSpriteName": "golden_thin_sword"
+      },
+      {
+        "weaponID": "sword_041_gold",
+        "itemName": "Gold Sword",
+        "weaponType": "Sword",
+        "damage": 16,
+        "attackSpeed": 1.0,
+        "weight": 6.0,
+        "description": "A sword crafted from pure gold. Heavy and ostentatious.",
+        "iconSpriteName": "gold_sword"
+      },
+      {
+        "weaponID": "sword_042_greater_amethyst",
+        "itemName": "Greater Amethyst Sword",
+        "weaponType": "Sword",
+        "damage": 29,
+        "attackSpeed": 1.05,
+        "weight": 5.3,
+        "description": "An amethyst sword of significant power, radiating magical energy.",
+        "iconSpriteName": "greater_amethyst_sword"
+      },
+      {
+        "weaponID": "sword_043_greater_copper",
+        "itemName": "Greater Copper Sword",
+        "weaponType": "Sword",
+        "damage": 14,
+        "attackSpeed": 1.0,
+        "weight": 5.2,
+        "description": "A masterfully crafted copper sword, superior to common variants.",
+        "iconSpriteName": "greater_copper_sword"
+      },
+      {
+        "weaponID": "sword_044_greater_gold",
+        "itemName": "Greater Gold Sword",
+        "weaponType": "Sword",
+        "damage": 19,
+        "attackSpeed": 0.98,
+        "weight": 6.5,
+        "description": "More than just ornamental, this golden sword holds a surprising edge.",
+        "iconSpriteName": "greater_gold_sword"
+      },
+      {
+        "weaponID": "sword_045_greater",
+        "itemName": "Greater Sword",
+        "weaponType": "Sword",
+        "damage": 23,
+        "attackSpeed": 1.0,
+        "weight": 5.7,
+        "description": "A sword of superior craftsmanship and balance.",
+        "iconSpriteName": "greater_sword"
+      },
+      {
+        "weaponID": "sword_046_great_amethyst",
+        "itemName": "Great Amethyst Sword",
+        "weaponType": "Sword",
+        "damage": 27,
+        "attackSpeed": 0.9,
+        "weight": 7.5,
+        "description": "A large two-handed sword with a massive amethyst embedded in its hilt.",
+        "iconSpriteName": "great_amethyst_sword"
+      },
+      {
+        "weaponID": "sword_047_great_bone",
+        "itemName": "Great Bone Sword",
+        "weaponType": "Sword",
+        "damage": 20,
+        "attackSpeed": 0.85,
+        "weight": 8.0,
+        "description": "A crude but formidable greatsword fashioned from the bones of a large beast.",
+        "iconSpriteName": "great_bone_sword"
+      },
+      {
+        "weaponID": "sword_048_great_copper",
+        "itemName": "Great Copper Sword",
+        "weaponType": "Sword",
+        "damage": 16,
+        "attackSpeed": 0.8,
+        "weight": 9.2,
+        "description": "A surprisingly large and heavy sword made of copper.",
+        "iconSpriteName": "great_copper_sword"
+      },
+      {
+        "weaponID": "sword_049_great_poison",
+        "itemName": "Great Poison Sword",
+        "weaponType": "Sword",
+        "damage": 24, // Dégâts de poison?
+        "attackSpeed": 0.82,
+        "weight": 8.8,
+        "description": "This enormous blade constantly drips with a virulent toxin.",
+        "iconSpriteName": "great_poison_sword"
+      },
+      {
+        "weaponID": "sword_050_great_ruby",
+        "itemName": "Great Ruby Sword",
+        "weaponType": "Sword",
+        "damage": 32,
+        "attackSpeed": 0.78,
+        "weight": 9.5,
+        "description": "A magnificent greatsword, its pommel adorned with a fist-sized ruby that pulses with power.",
+        "iconSpriteName": "great_ruby_sword"
+      },
+      {
+        "weaponID": "sword_051_great",
+        "itemName": "Great Sword",
+        "weaponType": "Sword",
+        "damage": 25,
+        "attackSpeed": 0.75,
+        "weight": 10.0,
+        "description": "A standard two-handed greatsword, requiring strength to wield effectively.",
+        "iconSpriteName": "great_sword"
+      },
+      {
+        "weaponID": "sword_052_green_spirit",
+        "itemName": "Green Spirit Sword",
+        "weaponType": "Sword",
+        "damage": 21, // Dégâts magiques ou nature?
+        "attackSpeed": 1.1,
+        "weight": 4.6,
+        "description": "The blade hums with a verdant, spiritual energy.",
+        "iconSpriteName": "green_spirit_sword"
+      },
+      {
+        "weaponID": "sword_053_heavy_copper",
+        "itemName": "Heavy Copper Sword",
+        "weaponType": "Sword",
+        "damage": 13,
+        "attackSpeed": 0.9,
+        "weight": 7.0,
+        "description": "A thick, heavy blade of copper. Slow but sturdy.",
+        "iconSpriteName": "heavy_copper_sword"
+      },
+      {
+        "weaponID": "sword_054_heavy_crystal",
+        "itemName": "Heavy Crystal Sword",
+        "weaponType": "Sword",
+        "damage": 28,
+        "attackSpeed": 0.85,
+        "weight": 6.5, // Crystal could be magically light despite being "heavy"
+        "description": "Though massive, this crystal sword feels lighter than it looks, and hits hard.",
+        "iconSpriteName": "heavy_crystal_sword"
+      },
+      {
+        "weaponID": "sword_055_heavy_diamond",
+        "itemName": "Heavy Diamond Sword",
+        "weaponType": "Sword",
+        "damage": 34,
+        "attackSpeed": 0.8,
+        "weight": 7.5,
+        "description": "A broadsword reinforced with diamond edges, capable of cleaving through tough defenses.",
+        "iconSpriteName": "heavy_diamond_sword"
+      },
+      {
+        "weaponID": "sword_056_heavy_lava",
+        "itemName": "Heavy Lava Sword",
+        "weaponType": "Sword",
+        "damage": 30, // Dégâts de feu?
+        "attackSpeed": 0.7,
+        "weight": 11.0,
+        "description": "Forged in volcanic heart, this heavy blade smolders with molten rock.",
+        "iconSpriteName": "heavy_lava_sword"
+      },
+      {
+        "weaponID": "sword_057_heavy",
+        "itemName": "Heavy Sword",
+        "weaponType": "Sword",
+        "damage": 18,
+        "attackSpeed": 0.85,
+        "weight": 8.0,
+        "description": "A standard heavy sword, requiring some effort to swing effectively.",
+        "iconSpriteName": "heavy_sword"
+      },
+      {
+        "weaponID": "sword_058_hyper_demonic",
+        "itemName": "Hyper Demonic Sword",
+        "weaponType": "Sword",
+        "damage": 55,
+        "attackSpeed": 0.75,
+        "weight": 9.0,
+        "description": "Overflowing with chaotic demonic energy, almost uncontrollable.",
+        "iconSpriteName": "hyper_demonic_sword"
+      },
+      {
+        "weaponID": "sword_059_ice_piercing",
+        "itemName": "Ice Piercing Sword",
+        "weaponType": "Sword",
+        "damage": 24, // Dégâts de glace? Bonus contre armure?
+        "attackSpeed": 1.1,
+        "weight": 4.9,
+        "description": "A shard of enchanted ice, shaped into a deadly piercing blade.",
+        "iconSpriteName": "ice_piercing_sword"
+      },
+      {
+        "weaponID": "foil_002_iron", // Changé weaponID pour "foil"
+        "itemName": "Iron Foil",
+        "weaponType": "Sword", // Ou "Foil"
+        "damage": 12,
+        "attackSpeed": 1.35,
+        "weight": 3.0,
+        "description": "A standard duelist's foil made of iron. Quick and precise.",
+        "iconSpriteName": "iron_foil"
+      },
+      {
+        "weaponID": "sword_060_iron",
+        "itemName": "Iron Sword",
+        "weaponType": "Sword",
+        "damage": 13,
+        "attackSpeed": 1.0,
+        "weight": 5.5,
+        "description": "A common but reliable iron longsword.",
+        "iconSpriteName": "iron_sword"
+      },
+      {
+        "weaponID": "sword_061_large_amethyst",
+        "itemName": "Large Amethyst Sword",
+        "weaponType": "Sword",
+        "damage": 30,
+        "attackSpeed": 0.88,
+        "weight": 7.8,
+        "description": "A broadsword featuring a large, empowering amethyst.",
+        "iconSpriteName": "large_amethyst_sword"
+      },
+      {
+        "weaponID": "sword_062_large_blood",
+        "itemName": "Large Blood Sword",
+        "weaponType": "Sword",
+        "damage": 32, // Effet de vol de vie?
+        "attackSpeed": 0.9,
+        "weight": 8.0,
+        "description": "This large, crimson blade seems to drink the blood of its victims.",
+        "iconSpriteName": "large_blood_sword"
+      },
+      {
+        "weaponID": "sword_063_large_copper",
+        "itemName": "Large Copper Sword",
+        "weaponType": "Sword",
+        "damage": 15,
+        "attackSpeed": 0.85,
+        "weight": 9.0,
+        "description": "An oversized copper sword, surprisingly hefty.",
+        "iconSpriteName": "large_copper_sword"
+      },
+      {
+        "weaponID": "sword_064_large_diamond",
+        "itemName": "Large Diamond Sword",
+        "weaponType": "Sword",
+        "damage": 38,
+        "attackSpeed": 0.82,
+        "weight": 8.2,
+        "description": "A massive blade crafted with large, reinforcing diamonds.",
+        "iconSpriteName": "large_diamond_sword"
+      },
+      {
+        "weaponID": "sword_065_large_emerald",
+        "itemName": "Large Emerald Sword",
+        "weaponType": "Sword",
+        "damage": 34, // Dégâts de nature ou poison?
+        "attackSpeed": 0.86,
+        "weight": 7.9,
+        "description": "A wide sword adorned with a brilliant, pulsating emerald.",
+        "iconSpriteName": "large_emerald_sword"
+      },
+      {
+        "weaponID": "sword_066_large_lava",
+        "itemName": "Large Lava Sword",
+        "weaponType": "Sword",
+        "damage": 36, // Dégâts de feu?
+        "attackSpeed": 0.78,
+        "weight": 10.5,
+        "description": "This broadsword appears to be forged from cooling lava.",
+        "iconSpriteName": "large_lava_sword"
+      },
+      {
+        "weaponID": "sword_067_large_lightning",
+        "itemName": "Large Lightning Sword",
+        "weaponType": "Sword",
+        "damage": 35, // Dégâts électriques?
+        "attackSpeed": 0.92,
+        "weight": 8.1,
+        "description": "A wide blade that crackles with untamed lightning.",
+        "iconSpriteName": "large_lightning_sword"
+      },
+      {
+        "weaponID": "sword_068_large_light",
+        "itemName": "Large Light Sword",
+        "weaponType": "Sword",
+        "damage": 37, // Dégâts sacrés?
+        "attackSpeed": 0.9,
+        "weight": 7.5, // La lumière pourrait le rendre plus léger
+        "description": "A broadsword made of pure, solidified light. Blinds the wicked.",
+        "iconSpriteName": "large_light_sword"
+      },
+      {
+        "weaponID": "sword_069_large_mist",
+        "itemName": "Large Mist Sword",
+        "weaponType": "Sword",
+        "damage": 28, // Effet d'illusion ou de dissimulation?
+        "attackSpeed": 0.95,
+        "weight": 7.0,
+        "description": "The blade of this large sword is partially obscured by a constant, swirling mist.",
+        "iconSpriteName": "large_mist_sword"
+      },
+      {
+        "weaponID": "sword_070_large_plasma",
+        "itemName": "Large Plasma Sword",
+        "weaponType": "Sword",
+        "damage": 40,
+        "attackSpeed": 0.8,
+        "weight": 8.5,
+        "description": "A wide blade of superheated plasma, searing through armor.",
+        "iconSpriteName": "large_plasma_sword"
+      },
+      {
+        "weaponID": "sword_071_large_poisonous",
+        "itemName": "Large Poisonous Sword",
+        "weaponType": "Sword",
+        "damage": 30, // Dégâts de poison sur la durée?
+        "attackSpeed": 0.87,
+        "weight": 8.3,
+        "description": "Venom constantly seeps from the edge of this imposing blade.",
+        "iconSpriteName": "large_poisonous_sword"
+      },
+      {
+        "weaponID": "sword_072_large_rain",
+        "itemName": "Large Rain Sword",
+        "weaponType": "Sword",
+        "damage": 29, // Dégâts d'eau?
+        "attackSpeed": 0.93,
+        "weight": 7.7,
+        "description": "Water seems to condense and flow along this large, shimmering blade.",
+        "iconSpriteName": "large_rain_sword"
+      },
+      {
+        "weaponID": "sword_073_large",
+        "itemName": "Large Sword",
+        "weaponType": "Sword",
+        "damage": 20,
+        "attackSpeed": 0.8,
+        "weight": 9.5,
+        "description": "A hefty, large sword for those who prefer reach and power.",
+        "iconSpriteName": "large_sword"
+      },
+      {
+        "weaponID": "sword_074_laser",
+        "itemName": "Laser Sword",
+        "weaponType": "Sword",
+        "damage": 35,
+        "attackSpeed": 1.2,
+        "weight": 2.0,
+        "description": "A hilt that projects a blade of pure energy. *Vroooom*.",
+        "iconSpriteName": "laser_sword"
+      },
+      {
+        "weaponID": "foil_003_lava", // Changé weaponID pour "foil"
+        "itemName": "Lava Foil",
+        "weaponType": "Sword", // Ou "Foil"
+        "damage": 22, // Dégâts de feu?
+        "attackSpeed": 1.3,
+        "weight": 2.8,
+        "description": "A duelist's foil with a core of molten lava, burning on contact.",
+        "iconSpriteName": "lava_foil"
+      },
+      {
+        "weaponID": "sword_075_mystic_fire",
+        "itemName": "Mystic Fire Sword",
+        "weaponType": "Sword",
+        "damage": 27,
+        "attackSpeed": 1.05,
+        "weight": 5.1,
+        "description": "Ancient symbols on this blade channel mystical fire.",
+        "iconSpriteName": "mystic_fire_sword"
+      },
+      {
+        "weaponID": "sword_076_mystic_ice",
+        "itemName": "Mystic Ice Sword",
+        "weaponType": "Sword",
+        "damage": 26,
+        "attackSpeed": 1.08,
+        "weight": 5.3,
+        "description": "Cold to the touch, this sword is infused with ancient frost magic.",
+        "iconSpriteName": "mystic_ice_sword"
+      },
+      {
+        "weaponID": "sword_077_night",
+        "itemName": "Night Sword",
+        "weaponType": "Sword",
+        "damage": 23, // Bonus la nuit ou contre créatures de la nuit?
+        "attackSpeed": 1.0,
+        "weight": 5.6,
+        "description": "A blade as dark as the starless night, potent in shadows.",
+        "iconSpriteName": "night_sword"
+      },
+      {
+        "weaponID": "sword_078_omega_fire",
+        "itemName": "Omega Fire Sword",
+        "weaponType": "Sword",
+        "damage": 50,
+        "attackSpeed": 0.9,
+        "weight": 7.0,
+        "description": "The ultimate expression of fire magic in sword form.",
+        "iconSpriteName": "omega_fire_sword"
+      },
+      {
+        "weaponID": "sword_079_omega_ice",
+        "itemName": "Omega Ice Sword",
+        "weaponType": "Sword",
+        "damage": 48,
+        "attackSpeed": 0.92,
+        "weight": 7.2,
+        "description": "A blade of absolute zero, freezing all it touches.",
+        "iconSpriteName": "omega_ice_sword"
+      },
+      {
+        "weaponID": "sword_080_omega_light",
+        "itemName": "Omega Light Sword",
+        "weaponType": "Sword",
+        "damage": 52,
+        "attackSpeed": 0.95,
+        "weight": 6.5,
+        "description": "The embodiment of pure, divine light, capable of smiting any darkness.",
+        "iconSpriteName": "omega_light_sword"
+      },
+      {
+        "weaponID": "sword_081_omega",
+        "itemName": "Omega Sword",
+        "weaponType": "Sword",
+        "damage": 60,
+        "attackSpeed": 0.8,
+        "weight": 10.0,
+        "description": "The final blade, said to hold ultimate power.",
+        "iconSpriteName": "omega_sword"
+      },
+      {
+        "weaponID": "sword_082_omega_water",
+        "itemName": "Omega Water Sword",
+        "weaponType": "Sword",
+        "damage": 47,
+        "attackSpeed": 0.93,
+        "weight": 6.8,
+        "description": "Controls the very essence of water, a flowing and crashing blade.",
+        "iconSpriteName": "omega_water_sword"
+      },
+      {
+        "weaponID": "sword_083_piercing",
+        "itemName": "Piercing Sword",
+        "weaponType": "Sword",
+        "damage": 16, // Bonus contre armure?
+        "attackSpeed": 1.2,
+        "weight": 4.3,
+        "description": "A sword designed to find gaps in armor.",
+        "iconSpriteName": "piercing_sword"
+      },
+      {
+        "weaponID": "sword_084_pirate",
+        "itemName": "Pirate Sword",
+        "weaponType": "Sword", // Ou "Cutlass" / "Saber"
+        "damage": 17,
+        "attackSpeed": 1.15,
+        "weight": 4.7,
+        "description": "A trusty cutlass, favored by swashbucklers and sea dogs.",
+        "iconSpriteName": "pirate_sword"
+      },
+      {
+        "weaponID": "sword_085_polyvalent",
+        "itemName": "Polyvalent Sword",
+        "weaponType": "Sword",
+        "damage": 18,
+        "attackSpeed": 1.0,
+        "weight": 5.0,
+        "description": "A versatile blade, well-suited for various combat styles.",
+        "iconSpriteName": "polyvalent_sword"
+      },
+      {
+        "weaponID": "sword_086_purple_laser",
+        "itemName": "Purple Laser Sword",
+        "weaponType": "Sword",
+        "damage": 38,
+        "attackSpeed": 1.18,
+        "weight": 2.2,
+        "description": "A laser sword emitting an ominous purple glow.",
+        "iconSpriteName": "purple_laser_sword"
+      },
+      {
+        "weaponID": "sword_087_purple_spirit",
+        "itemName": "Purple Spirit Sword",
+        "weaponType": "Sword",
+        "damage": 24,
+        "attackSpeed": 1.12,
+        "weight": 4.4,
+        "description": "This blade is a conduit for a powerful, violet-hued spirit.",
+        "iconSpriteName": "purple_spirit_sword"
+      },
+      {
+        "weaponID": "sword_088_red_hero",
+        "itemName": "Red Hero's Sword",
+        "weaponType": "Sword",
+        "damage": 22,
+        "attackSpeed": 1.13,
+        "weight": 4.9,
+        "description": "The fiery blade of a passionate hero clad in red.",
+        "iconSpriteName": "red_hero_sword"
+      },
+      {
+        "weaponID": "sword_089_reinforced_amethyst",
+        "itemName": "Reinforced Amethyst Sword",
+        "weaponType": "Sword",
+        "damage": 31,
+        "attackSpeed": 1.0,
+        "weight": 5.8,
+        "description": "An amethyst sword further strengthened with arcane metals.",
+        "iconSpriteName": "reinforced_amethyst_sword"
+      },
+      {
+        "weaponID": "sword_090_reinforced_copper",
+        "itemName": "Reinforced Copper Sword",
+        "weaponType": "Sword",
+        "damage": 13,
+        "attackSpeed": 0.98,
+        "weight": 5.5,
+        "description": "Copper blade with steel reinforcements along the edge and fuller.",
+        "iconSpriteName": "reinforced_copper_sword"
+      },
+      {
+        "weaponID": "sword_091_reinforced_crystal",
+        "itemName": "Reinforced Crystal Sword",
+        "weaponType": "Sword",
+        "damage": 29,
+        "attackSpeed": 0.95,
+        "weight": 4.0, // Crystal est léger
+        "description": "Crystal blade bound with enchanted bands for increased durability.",
+        "iconSpriteName": "reinforced_crystal_sword"
+      },
+      {
+        "weaponID": "sword_092_reinforced",
+        "itemName": "Reinforced Sword",
+        "weaponType": "Sword",
+        "damage": 19,
+        "attackSpeed": 0.95,
+        "weight": 6.2,
+        "description": "A standard sword that has been additionally reinforced for greater resilience.",
+        "iconSpriteName": "reinforced_sword"
+      },
+      {
+        "weaponID": "sword_093_reinforced_topaz",
+        "itemName": "Reinforced Topaz Sword",
+        "weaponType": "Sword",
+        "damage": 28,
+        "attackSpeed": 1.02,
+        "weight": 5.6,
+        "description": "A topaz-adorned sword, its structure fortified by master smiths.",
+        "iconSpriteName": "reinforced_topaz_sword"
+      },
+      {
+        "weaponID": "sword_094_ruby",
+        "itemName": "Ruby Sword",
+        "weaponType": "Sword",
+        "damage": 25,
+        "attackSpeed": 1.0,
+        "weight": 5.4,
+        "description": "A fine sword with a brilliant ruby set into its pommel.",
+        "iconSpriteName": "ruby_sword"
+      },
+      {
+        "weaponID": "foil_004_silver", // Changé weaponID pour "foil"
+        "itemName": "Silver Foil",
+        "weaponType": "Sword", // Ou "Foil"
+        "damage": 15, // Efficace contre certains monstres?
+        "attackSpeed": 1.38,
+        "weight": 2.9,
+        "description": "A silver foil, excellent for dispatching creatures vulnerable to the metal.",
+        "iconSpriteName": "silver_foil"
+      },
+      {
+        "weaponID": "sword_095_silver",
+        "itemName": "Silver Sword",
+        "weaponType": "Sword",
+        "damage": 18, // Efficace contre certains monstres?
+        "attackSpeed": 1.05,
+        "weight": 5.3,
+        "description": "A sword crafted from silver, said to harm supernatural foes.",
+        "iconSpriteName": "silver_sword"
+      },
+      {
+        "weaponID": "sword_096_spirit",
+        "itemName": "Spirit Sword",
+        "weaponType": "Sword",
+        "damage": 20,
+        "attackSpeed": 1.15,
+        "weight": 3.5, // Les épées spirituelles sont souvent légères
+        "description": "An ethereal blade that seems to phase in and out of existence.",
+        "iconSpriteName": "spirit_sword"
+      },
+      {
+        "weaponID": "sword_097_super_demonic",
+        "itemName": "Super Demonic Sword",
+        "weaponType": "Sword",
+        "damage": 48,
+        "attackSpeed": 0.8,
+        "weight": 8.5,
+        "description": "A blade steeped in an overwhelming demonic aura.",
+        "iconSpriteName": "super_demonic_sword"
+      },
+      {
+        "weaponID": "sword_098_super_electric",
+        "itemName": "Super Electric Sword",
+        "weaponType": "Sword",
+        "damage": 32,
+        "attackSpeed": 1.1,
+        "weight": 5.0,
+        "description": "Conducts an immense amount of electrical power.",
+        "iconSpriteName": "super_electric_sword"
+      },
+      {
+        "weaponID": "sword_099_super_fire",
+        "itemName": "Super Fire Sword",
+        "weaponType": "Sword",
+        "damage": 34,
+        "attackSpeed": 1.0,
+        "weight": 5.9,
+        "description": "Burns with the intensity of a thousand suns (not really, but it's very hot).",
+        "iconSpriteName": "super_fire_sword"
+      },
+      {
+        "weaponID": "sword_100_super_ice",
+        "itemName": "Super Ice Sword",
+        "weaponType": "Sword",
+        "damage": 33,
+        "attackSpeed": 1.02,
+        "weight": 6.1,
+        "description": "Radiates an unnatural cold, capable of freezing foes solid.",
+        "iconSpriteName": "super_ice_sword"
+      },
+      {
+        "weaponID": "sword_101_sworded",
+        "itemName": "Sworded Sword",
+        "weaponType": "Sword",
+        "damage": 17,
+        "attackSpeed": 1.0,
+        "weight": 5.0,
+        "description": "This sword is particularly... sword-like.",
+        "iconSpriteName": "sworded_sword"
+      },
+      {
+        "weaponID": "sword_102_thin",
+        "itemName": "Thin Sword",
+        "weaponType": "Sword", // Ou Rapier/Foil
+        "damage": 10,
+        "attackSpeed": 1.45,
+        "weight": 2.0,
+        "description": "A very slender blade, designed for quick thrusts.",
+        "iconSpriteName": "thin_sword"
+      },
+      {
+        "weaponID": "sword_103_wooden_pirate",
+        "itemName": "Wooden Pirate Sword",
+        "weaponType": "Sword",
+        "damage": 6,
+        "attackSpeed": 1.1,
+        "weight": 3.0,
+        "description": "A practice sword for aspiring young pirates. Arrr!",
+        "iconSpriteName": "wooden_pirate_sword"
       }
       
     ]
