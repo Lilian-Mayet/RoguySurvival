@@ -123,10 +123,24 @@ public class PlayerStats : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Space)) // Example attack
+if (Input.GetKeyDown(KeyCode.Space)) // Example: Equip Random Weapon
+    {
+        if (WeaponDataManager.Instance != null && WeaponDataManager.Instance.weaponList.Count > 0)
         {
-            EquipWeapon("hammer_021_silver_smacker"); // Make sure this ID exists in your JSON
+            // Choisir un index aléatoire dans la liste des armes
+            int randomIndex = Random.Range(0, WeaponDataManager.Instance.weaponList.Count);
+            
+            // Récupérer l'ID de l'arme à cet index
+            string randomWeaponID = WeaponDataManager.Instance.weaponList[randomIndex].weaponID;
+            
+            EquipWeapon(randomWeaponID);
+            Debug.Log($"Equipped random weapon: {randomWeaponID} ({WeaponDataManager.Instance.GetWeaponStats(randomWeaponID)?.itemName})");
         }
+        else
+        {
+            Debug.LogWarning("WeaponDataManager not ready or weapon list is empty. Cannot equip random weapon.");
+        }
+    }
 
     }
 }

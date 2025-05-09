@@ -421,10 +421,10 @@
         "iconSpriteName": "blue_hero_sword"
       },
       {
-        "weaponID": "sword_027_braising", // Vérifiez le nom: "braising" ou "blazing"/"branding"?
+        "weaponID": "sword_027_braising",  
         "itemName": "Braising Sword",
         "weaponType": "Sword",
-        "damage": 19, // Dégâts de feu?
+        "damage": 19, 
         "attackSpeed": 1.0,
         "weight": 5.2,
         "description": "This sword seems to simmer with intense heat.",
@@ -434,7 +434,7 @@
         "weaponID": "sword_028_carbonating",
         "itemName": "Carbonating Sword",
         "weaponType": "Sword",
-        "damage": 16, // Dégâts de type acide ou gaz?
+        "damage": 16, 
         "attackSpeed": 1.2,
         "weight": 4.0,
         "description": "Effervescent energy crackles along its edge.",
@@ -454,16 +454,16 @@
         "weaponID": "sword_030_cursed",
         "itemName": "Cursed Sword",
         "weaponType": "Sword",
-        "damage": 30, // Dégâts élevés, mais malus?
+        "damage": 30, 
         "attackSpeed": 0.9,
         "weight": 6.0,
         "description": "A wicked blade that thirsts for souls. Wield with caution.",
         "iconSpriteName": "cursed_sword"
       },
       {
-        "weaponID": "saber_001_curved", // Changé weaponID pour refléter "saber"
+        "weaponID": "saber_001_curved", 
         "itemName": "Curved Saber",
-        "weaponType": "Sword", // Ou un nouveau type "Saber"
+        "weaponType": "Sword", 
         "damage": 17,
         "attackSpeed": 1.25,
         "weight": 4.2,
@@ -494,7 +494,7 @@
         "weaponID": "sword_033_dawn",
         "itemName": "Dawn Sword",
         "weaponType": "Sword",
-        "damage": 26, // Efficace contre les morts-vivants?
+        "damage": 26, 
         "attackSpeed": 1.1,
         "weight": 5.0,
         "description": "A blade that shines with the first light of dawn, banishing shadows.",
@@ -521,9 +521,9 @@
         "iconSpriteName": "diamond_dragon_sword"
       },
       {
-        "weaponID": "foil_001_diamond", // Changé weaponID pour "foil"
+        "weaponID": "foil_001_diamond", 
         "itemName": "Diamond Foil",
-        "weaponType": "Sword", // Ou un nouveau type "Foil" / "Rapier"
+        "weaponType": "Sword", 
         "damage": 18,
         "attackSpeed": 1.4,
         "weight": 2.5,
@@ -544,7 +544,7 @@
         "weaponID": "sword_037_electric_piercing",
         "itemName": "Electric Piercing Sword",
         "weaponType": "Sword",
-        "damage": 20, // Dégâts électriques? Bonus contre armure?
+        "damage": 20, 
         "attackSpeed": 1.15,
         "weight": 4.7,
         "description": "Designed to pierce armor, this blade also delivers a shocking jolt.",
@@ -554,7 +554,7 @@
         "weaponID": "sword_038_flaming",
         "itemName": "Flaming Sword",
         "weaponType": "Sword",
-        "damage": 22, // Dégâts de feu?
+        "damage": 22, 
         "attackSpeed": 1.0,
         "weight": 5.8,
         "description": "This sword is wreathed in magical, ever-burning flames.",
@@ -664,7 +664,7 @@
         "weaponID": "sword_049_great_poison",
         "itemName": "Great Poison Sword",
         "weaponType": "Sword",
-        "damage": 24, // Dégâts de poison?
+        "damage": 24, 
         "attackSpeed": 0.82,
         "weight": 8.8,
         "description": "This enormous blade constantly drips with a virulent toxin.",
@@ -694,7 +694,7 @@
         "weaponID": "sword_052_green_spirit",
         "itemName": "Green Spirit Sword",
         "weaponType": "Sword",
-        "damage": 21, // Dégâts magiques ou nature?
+        "damage": 21, 
         "attackSpeed": 1.1,
         "weight": 4.6,
         "description": "The blade hums with a verdant, spiritual energy.",
@@ -716,7 +716,7 @@
         "weaponType": "Sword",
         "damage": 28,
         "attackSpeed": 0.85,
-        "weight": 6.5, // Crystal could be magically light despite being "heavy"
+        "weight": 6.5, 
         "description": "Though massive, this crystal sword feels lighter than it looks, and hits hard.",
         "iconSpriteName": "heavy_crystal_sword"
       },
@@ -734,7 +734,7 @@
         "weaponID": "sword_056_heavy_lava",
         "itemName": "Heavy Lava Sword",
         "weaponType": "Sword",
-        "damage": 30, // Dégâts de feu?
+        "damage": 30,
         "attackSpeed": 0.7,
         "weight": 11.0,
         "description": "Forged in volcanic heart, this heavy blade smolders with molten rock.",
@@ -764,16 +764,16 @@
         "weaponID": "sword_059_ice_piercing",
         "itemName": "Ice Piercing Sword",
         "weaponType": "Sword",
-        "damage": 24, // Dégâts de glace? Bonus contre armure?
+        "damage": 24, 
         "attackSpeed": 1.1,
         "weight": 4.9,
         "description": "A shard of enchanted ice, shaped into a deadly piercing blade.",
         "iconSpriteName": "ice_piercing_sword"
       },
       {
-        "weaponID": "foil_002_iron", // Changé weaponID pour "foil"
+        "weaponID": "foil_002_iron", 
         "itemName": "Iron Foil",
-        "weaponType": "Sword", // Ou "Foil"
+        "weaponType": "Sword", 
         "damage": 12,
         "attackSpeed": 1.35,
         "weight": 3.0,
@@ -804,7 +804,7 @@
         "weaponID": "sword_062_large_blood",
         "itemName": "Large Blood Sword",
         "weaponType": "Sword",
-        "damage": 32, // Effet de vol de vie?
+        "damage": 32, 
         "attackSpeed": 0.9,
         "weight": 8.0,
         "description": "This large, crimson blade seems to drink the blood of its victims.",
@@ -834,7 +834,7 @@
         "weaponID": "sword_065_large_emerald",
         "itemName": "Large Emerald Sword",
         "weaponType": "Sword",
-        "damage": 34, // Dégâts de nature ou poison?
+        "damage": 34, 
         "attackSpeed": 0.86,
         "weight": 7.9,
         "description": "A wide sword adorned with a brilliant, pulsating emerald.",
@@ -844,7 +844,7 @@
         "weaponID": "sword_066_large_lava",
         "itemName": "Large Lava Sword",
         "weaponType": "Sword",
-        "damage": 36, // Dégâts de feu?
+        "damage": 36, 
         "attackSpeed": 0.78,
         "weight": 10.5,
         "description": "This broadsword appears to be forged from cooling lava.",
@@ -854,7 +854,7 @@
         "weaponID": "sword_067_large_lightning",
         "itemName": "Large Lightning Sword",
         "weaponType": "Sword",
-        "damage": 35, // Dégâts électriques?
+        "damage": 35, 
         "attackSpeed": 0.92,
         "weight": 8.1,
         "description": "A wide blade that crackles with untamed lightning.",
@@ -864,9 +864,9 @@
         "weaponID": "sword_068_large_light",
         "itemName": "Large Light Sword",
         "weaponType": "Sword",
-        "damage": 37, // Dégâts sacrés?
+        "damage": 37, 
         "attackSpeed": 0.9,
-        "weight": 7.5, // La lumière pourrait le rendre plus léger
+        "weight": 7.5, 
         "description": "A broadsword made of pure, solidified light. Blinds the wicked.",
         "iconSpriteName": "large_light_sword"
       },
@@ -874,7 +874,7 @@
         "weaponID": "sword_069_large_mist",
         "itemName": "Large Mist Sword",
         "weaponType": "Sword",
-        "damage": 28, // Effet d'illusion ou de dissimulation?
+        "damage": 28, 
         "attackSpeed": 0.95,
         "weight": 7.0,
         "description": "The blade of this large sword is partially obscured by a constant, swirling mist.",
@@ -894,7 +894,7 @@
         "weaponID": "sword_071_large_poisonous",
         "itemName": "Large Poisonous Sword",
         "weaponType": "Sword",
-        "damage": 30, // Dégâts de poison sur la durée?
+        "damage": 30, 
         "attackSpeed": 0.87,
         "weight": 8.3,
         "description": "Venom constantly seeps from the edge of this imposing blade.",
@@ -904,7 +904,7 @@
         "weaponID": "sword_072_large_rain",
         "itemName": "Large Rain Sword",
         "weaponType": "Sword",
-        "damage": 29, // Dégâts d'eau?
+        "damage": 29, 
         "attackSpeed": 0.93,
         "weight": 7.7,
         "description": "Water seems to condense and flow along this large, shimmering blade.",
@@ -931,10 +931,10 @@
         "iconSpriteName": "laser_sword"
       },
       {
-        "weaponID": "foil_003_lava", // Changé weaponID pour "foil"
+        "weaponID": "foil_003_lava", 
         "itemName": "Lava Foil",
-        "weaponType": "Sword", // Ou "Foil"
-        "damage": 22, // Dégâts de feu?
+        "weaponType": "Sword", 
+        "damage": 22, 
         "attackSpeed": 1.3,
         "weight": 2.8,
         "description": "A duelist's foil with a core of molten lava, burning on contact.",
@@ -964,7 +964,7 @@
         "weaponID": "sword_077_night",
         "itemName": "Night Sword",
         "weaponType": "Sword",
-        "damage": 23, // Bonus la nuit ou contre créatures de la nuit?
+        "damage": 23, 
         "attackSpeed": 1.0,
         "weight": 5.6,
         "description": "A blade as dark as the starless night, potent in shadows.",
@@ -1024,7 +1024,7 @@
         "weaponID": "sword_083_piercing",
         "itemName": "Piercing Sword",
         "weaponType": "Sword",
-        "damage": 16, // Bonus contre armure?
+        "damage": 16, 
         "attackSpeed": 1.2,
         "weight": 4.3,
         "description": "A sword designed to find gaps in armor.",
@@ -1033,7 +1033,7 @@
       {
         "weaponID": "sword_084_pirate",
         "itemName": "Pirate Sword",
-        "weaponType": "Sword", // Ou "Cutlass" / "Saber"
+        "weaponType": "Sword", 
         "damage": 17,
         "attackSpeed": 1.15,
         "weight": 4.7,
@@ -1106,7 +1106,7 @@
         "weaponType": "Sword",
         "damage": 29,
         "attackSpeed": 0.95,
-        "weight": 4.0, // Crystal est léger
+        "weight": 4.0, 
         "description": "Crystal blade bound with enchanted bands for increased durability.",
         "iconSpriteName": "reinforced_crystal_sword"
       },
@@ -1141,10 +1141,10 @@
         "iconSpriteName": "ruby_sword"
       },
       {
-        "weaponID": "foil_004_silver", // Changé weaponID pour "foil"
+        "weaponID": "foil_004_silver",
         "itemName": "Silver Foil",
-        "weaponType": "Sword", // Ou "Foil"
-        "damage": 15, // Efficace contre certains monstres?
+        "weaponType": "Sword",
+        "damage": 15, 
         "attackSpeed": 1.38,
         "weight": 2.9,
         "description": "A silver foil, excellent for dispatching creatures vulnerable to the metal.",
@@ -1154,7 +1154,7 @@
         "weaponID": "sword_095_silver",
         "itemName": "Silver Sword",
         "weaponType": "Sword",
-        "damage": 18, // Efficace contre certains monstres?
+        "damage": 18, 
         "attackSpeed": 1.05,
         "weight": 5.3,
         "description": "A sword crafted from silver, said to harm supernatural foes.",
@@ -1166,7 +1166,7 @@
         "weaponType": "Sword",
         "damage": 20,
         "attackSpeed": 1.15,
-        "weight": 3.5, // Les épées spirituelles sont souvent légères
+        "weight": 3.5, 
         "description": "An ethereal blade that seems to phase in and out of existence.",
         "iconSpriteName": "spirit_sword"
       },
@@ -1223,7 +1223,7 @@
       {
         "weaponID": "sword_102_thin",
         "itemName": "Thin Sword",
-        "weaponType": "Sword", // Ou Rapier/Foil
+        "weaponType": "Sword",
         "damage": 10,
         "attackSpeed": 1.45,
         "weight": 2.0,
