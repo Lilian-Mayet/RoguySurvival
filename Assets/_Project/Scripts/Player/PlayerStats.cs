@@ -10,7 +10,7 @@ public class PlayerStats : MonoBehaviour
 
     [Header("Weapon")]
     public WeaponStats equippedWeaponStats; // Stores the stats of the currently equipped weapon
-    private string equippedWeaponID = "iron_sword"; // Store just the ID to re-fetch if needed
+    private string equippedWeaponID = ""; // Store just the ID to re-fetch if needed
 
     [Header("UI References")]
     public Image weaponIconDisplay; // NOUVELLE LIGNE : Assignez votre "WeaponSlot_Icon" ici
@@ -65,7 +65,7 @@ public class PlayerStats : MonoBehaviour
             {
                 equippedWeaponStats = statsToEquip;
                 equippedWeaponID = weaponID;
-                Debug.Log($"Player equipped: {equippedWeaponStats.itemName}");
+                Debug.Log($"Player equipped: {equippedWeaponStats.itemName} of type {equippedWeaponStats.weaponType} ");
             }
             else
             {
@@ -84,7 +84,7 @@ public class PlayerStats : MonoBehaviour
 
         if (equippedWeaponStats != null && !string.IsNullOrEmpty(equippedWeaponStats.iconSpriteName))
         {
-            Sprite icon = WeaponDataManager.Instance.GetWeaponIcon(equippedWeaponStats.weaponType.ToString(),equippedWeaponStats.iconSpriteName);
+            Sprite icon = WeaponDataManager.Instance.GetWeaponIcon(equippedWeaponStats.weaponType.ToString(), equippedWeaponStats.iconSpriteName);
             if (icon != null)
             {
                 weaponIconDisplay.sprite = icon;
@@ -125,7 +125,7 @@ public class PlayerStats : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space)) // Example attack
         {
-            EquipWeapon("iron_sword"); // Make sure this ID exists in your JSON
+            EquipWeapon("hammer_021_silver_smacker"); // Make sure this ID exists in your JSON
         }
 
     }

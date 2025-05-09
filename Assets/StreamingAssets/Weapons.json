@@ -1,14 +1,354 @@
 {
     "allWeapons": [
       {
-        "weaponID": "iron_sword",
-        "itemName": "Iron Sword",
-        "weaponType": "Sword",
+        "weaponID": "mace_001_air",
+        "itemName": "Air Mace",
+        "weaponType": "Hammer", 
+        "damage": 12,
+        "attackSpeed": 1.3,
+        "weight": 5.5,
+        "description": "Light as a feather, strikes with the force of a gale.",
+        "iconSpriteName": "air_mace"
+      },
+      {
+        "weaponID": "spikeball_001_improved",
+        "itemName": "Improved Spike Ball",
+        "weaponType": "Hammer", 
+        "damage": 18,
+        "attackSpeed": 0.9,
+        "weight": 9.0,
+        "description": "Reinforced chain and sharper spikes make this flail a dangerous tool.",
+        "iconSpriteName": "better_spike_ball"
+      },
+      {
+        "weaponID": "spikeball_002_burning",
+        "itemName": "Burning Spike Ball",
+        "weaponType": "Hammer", 
+        "damage": 20, 
+        "attackSpeed": 0.85,
+        "weight": 9.5,
+        "description": "A terrifying flail, perpetually engulfed in magical flames.",
+        "iconSpriteName": "burning_spike_ball" 
+      },
+      {
+        "weaponID": "hammer_001_combat",
+        "itemName": "Combat Hammer",
+        "weaponType": "Hammer",
+        "damage": 22,
+        "attackSpeed": 0.9,
+        "weight": 10.0,
+        "description": "A well-balanced hammer, crafted for the rigors of battle.",
+        "iconSpriteName": "combat_hammer"
+      },
+      {
+        "weaponID": "hammer_002_copper_bonker",
+        "itemName": "Copper Bonker",
+        "weaponType": "Hammer",
+        "damage": 8,
+        "attackSpeed": 1.0,
+        "weight": 7.0,
+        "description": "A crude club made of copper. Good for bonking.",
+        "iconSpriteName": "copper_bonker"
+      },
+      {
+        "weaponID": "hammer_003_copper",
+        "itemName": "Copper Hammer",
+        "weaponType": "Hammer",
         "damage": 10,
-        "attackSpeed": 1.2,
+        "attackSpeed": 0.95,
+        "weight": 7.5,
+        "description": "A standard craftsman's hammer, surprisingly effective.",
+        "iconSpriteName": "copper_hammer"
+      },
+      {
+        "weaponID": "hammer_004_copper_smacker",
+        "itemName": "Copper Smacker",
+        "weaponType": "Hammer",
+        "damage": 9,
+        "attackSpeed": 1.0,
+        "weight": 7.2,
+        "description": "Polished copper that delivers a solid smack.",
+        "iconSpriteName": "copper_smacker"
+      },
+      {
+        "weaponID": "hammer_005_cursed_combat",
+        "itemName": "Cursed Combat Hammer",
+        "weaponType": "Hammer",
+        "damage": 28, 
+        "attackSpeed": 0.85,
+        "weight": 11.0,
+        "description": "Whispers follow this battle-worn hammer, promising power at a price.",
+        "iconSpriteName": "cursed_combat_hammer"
+      },
+      {
+        "weaponID": "hammer_006_cursed_heavy",
+        "itemName": "Cursed Heavy Hammer",
+        "weaponType": "Hammer",
+        "damage": 35,
+        "attackSpeed": 0.7,
+        "weight": 15.0,
+        "description": "Each swing feels like an eternity, but the impact is devastating. It drains the wielder.",
+        "iconSpriteName": "cursed_heavy_hammer"
+      },
+      {
+        "weaponID": "hammer_007_dark_combat",
+        "itemName": "Dark Combat Hammer",
+        "weaponType": "Hammer",
+        "damage": 25,
+        "attackSpeed": 0.88,
+        "weight": 10.5,
+        "description": "Forged in abyssal shadow, its strikes steal the light.",
+        "iconSpriteName": "dark_combat_hammer"
+      },
+      {
+        "weaponID": "hammer_008_dark_skull",
+        "itemName": "Dark Skull Hammer",
+        "weaponType": "Hammer",
+        "damage": 30,
+        "attackSpeed": 0.75,
+        "weight": 13.0,
+        "description": "The skull adorning this hammer seems to stare into your soul.",
+        "iconSpriteName": "dark_skull_hammer"
+      },
+      {
+        "weaponID": "hammer_009_demonic_heavy",
+        "itemName": "Demonic Heavy Hammer",
+        "weaponType": "Hammer",
+        "damage": 40,
+        "attackSpeed": 0.65,
+        "weight": 18.0,
+        "description": "Only the strongest can wield this infernal weapon of destruction.",
+        "iconSpriteName": "demonic_heavy_hammer"
+      },
+      {
+        "weaponID": "mace_002_electric",
+        "itemName": "Electric Mace",
+        "weaponType": "Hammer", 
+        "damage": 15, 
+        "attackSpeed": 1.0,
+        "weight": 6.5,
+        "description": "A mace that zaps foes with arcing electricity.",
+        "iconSpriteName": "electric_mace"
+      },
+      {
+        "weaponID": "hammer_010_enchanted_combat",
+        "itemName": "Enchanted Combat Hammer",
+        "weaponType": "Hammer",
+        "damage": 24,
+        "attackSpeed": 0.92,
+        "weight": 10.2,
+        "description": "Runes glow faintly on this hammer, enhancing its striking power.",
+        "iconSpriteName": "enchanted_combat_hammer"
+      },
+      {
+        "weaponID": "hammer_011_enchanted_heavy",
+        "itemName": "Enchanted Heavy Hammer",
+        "weaponType": "Hammer",
+        "damage": 32,
+        "attackSpeed": 0.72,
+        "weight": 14.5,
+        "description": "Magically lightened despite its size, this hammer hits with enchanted force.",
+        "iconSpriteName": "enchanted_heavy_hammer"
+      },
+      {
+        "weaponID": "mace_003_fire",
+        "itemName": "Fire Mace",
+        "weaponType": "Hammer", 
+        "damage": 16, 
+        "attackSpeed": 0.98,
+        "weight": 6.8,
+        "description": "The head of this mace burns with an unholy fire.",
+        "iconSpriteName": "fire_mace"
+      },
+      {
+        "weaponID": "hammer_012_fire_skull",
+        "itemName": "Fire Skull Hammer",
+        "weaponType": "Hammer",
+        "damage": 33,
+        "attackSpeed": 0.73,
+        "weight": 13.5,
+        "description": "A skull-shaped hammer wreathed in eternal flames.",
+        "iconSpriteName": "fire_skull_hammer"
+      },
+      {
+        "weaponID": "hammer_013_glass",
+        "itemName": "Glass Hammer",
+        "weaponType": "Hammer",
+        "damage": 20, 
+        "attackSpeed": 1.1,
+        "weight": 4.0,
+        "description": "Beautifully crafted from enchanted glass. Surprisingly potent, but looks like it could shatter.",
+        "iconSpriteName": "glass_hammer"
+      },
+      {
+        "weaponID": "hammer_014_golden_bonker",
+        "itemName": "Golden Bonker",
+        "weaponType": "Hammer",
+        "damage": 10,
+        "attackSpeed": 1.05,
+        "weight": 8.0,
+        "description": "A bonker made of solid gold. More for show than for serious combat.",
+        "iconSpriteName": "golden_bonker"
+      },
+      {
+        "weaponID": "hammer_015_golden_smacker",
+        "itemName": "Golden Smacker",
+        "weaponType": "Hammer",
+        "damage": 11,
+        "attackSpeed": 1.02,
+        "weight": 8.2,
+        "description": "Heavier than it looks, this golden smacker has a satisfying thud.",
+        "iconSpriteName": "golden_smacker"
+      },
+      {
+        "weaponID": "hammer_016_heavy",
+        "itemName": "Heavy Hammer",
+        "weaponType": "Hammer",
+        "damage": 28,
+        "attackSpeed": 0.7,
+        "weight": 14.0,
+        "description": "A massive slab of metal on a stick. Slow but powerful.",
+        "iconSpriteName": "heavy_hammer"
+      },
+      {
+        "weaponID": "mace_004_ice",
+        "itemName": "Ice Mace",
+        "weaponType": "Hammer", 
+        "damage": 14, 
+        "attackSpeed": 1.0,
+        "weight": 7.0,
+        "description": "Permanently frozen, this mace can chill foes to the bone.",
+        "iconSpriteName": "ice_mace"
+      },
+      {
+        "weaponID": "hammer_017_ice_skull",
+        "itemName": "Ice Skull Hammer",
+        "weaponType": "Hammer",
+        "damage": 31,
+        "attackSpeed": 0.74,
+        "weight": 13.8,
+        "description": "A skull hammer encased in magical ice, radiating a chilling aura.",
+        "iconSpriteName": "ice_skull_hammer"
+      },
+      {
+        "weaponID": "spikeball_003_icy",
+        "itemName": "Icy Spike Ball",
+        "weaponType": "Hammer", 
+        "damage": 19, 
+        "attackSpeed": 0.88,
+        "weight": 9.2,
+        "description": "The spikes of this flail are coated in jagged ice.",
+        "iconSpriteName": "icy_spike_ball"
+      },
+      {
+        "weaponID": "hammer_018_iron",
+        "itemName": "Iron Hammer",
+        "weaponType": "Hammer",
+        "damage": 15,
+        "attackSpeed": 0.9,
+        "weight": 9.0,
+        "description": "A smith's iron hammer, repurposed for combat.",
+        "iconSpriteName": "iron_hammer"
+      },
+      {
+        "weaponID": "hammer_019_iron_smacker",
+        "itemName": "Iron Smacker",
+        "weaponType": "Hammer",
+        "damage": 14,
+        "attackSpeed": 0.92,
+        "weight": 8.8,
+        "description": "A solid piece of iron designed for maximum impact.",
+        "iconSpriteName": "iron_smacker"
+      },
+      {
+        "weaponID": "spikeball_004_poisonous",
+        "itemName": "Poisonous Spike Ball",
+        "weaponType": "Hammer", 
+        "damage": 16, 
+        "attackSpeed": 0.9,
+        "weight": 9.1,
+        "description": "Each spike on this flail drips with a potent toxin.",
+        "iconSpriteName": "poisonous_spike_ball"
+      },
+      {
+        "weaponID": "mace_005_rock",
+        "itemName": "Rock Mace",
+        "weaponType": "Hammer", 
+        "damage": 17,
+        "attackSpeed": 0.85,
+        "weight": 10.0,
+        "description": "A crudely fashioned mace from a heavy, dense rock.",
+        "iconSpriteName": "rock_mace"
+      },
+      {
+        "weaponID": "hammer_020_silver_bonker",
+        "itemName": "Silver Bonker",
+        "weaponType": "Hammer",
+        "damage": 10, 
+        "attackSpeed": 1.0,
+        "weight": 7.5,
+        "description": "A bonker plated with silver, said to be effective against unholy creatures.",
+        "iconSpriteName": "silver_bonker"
+      },
+      {
+        "weaponID": "hammer_021_silver_smacker",
+        "itemName": "Silver Smacker",
+        "weaponType": "Hammer",
+        "damage": 11,
+        "attackSpeed": 0.98,
+        "weight": 7.8,
+        "description": "This silver smacker gleams menacingly.",
+        "iconSpriteName": "silver_smacker"
+      },
+      {
+        "weaponID": "hammer_022_skull",
+        "itemName": "Skull Hammer",
+        "weaponType": "Hammer",
+        "damage": 26,
+        "attackSpeed": 0.8,
+        "weight": 12.0,
+        "description": "An intimidating hammer crafted with a large, heavy skull.",
+        "iconSpriteName": "skull_hammer"
+      },
+      {
+        "weaponID": "spikeball_005_plain",
+        "itemName": "Spike Ball",
+        "weaponType": "Hammer", 
+        "damage": 14,
+        "attackSpeed": 0.95,
+        "weight": 8.5,
+        "description": "A simple but brutal flail with a spiked metal ball.",
+        "iconSpriteName": "spike_ball"
+      },
+      {
+        "weaponID": "hammer_023_wooden_bonker",
+        "itemName": "Wooden Bonker", 
+        "weaponType": "Hammer",
+        "damage": 4,
+        "attackSpeed": 1.1,
+        "weight": 4.5,
+        "description": "A very basic wooden club. Nice Bonk",
+        "iconSpriteName": "wooden_bonker" 
+      },
+      {
+        "weaponID": "hammer_024_wood",
+        "itemName": "Wooden Hammer",
+        "weaponType": "Hammer",
+        "damage": 5,
+        "attackSpeed": 1.0,
         "weight": 5.0,
-        "description": "A sturdy sword made of iron.",
-        "iconSpriteName": "Iron_sword"
+        "description": "A simple hammer made from sturdy wood.",
+        "iconSpriteName": "wood_hammer"
+      },
+      {
+        "weaponID": "hammer_025_wood_heavy",
+        "itemName": "Heavy Wooden Hammer",
+        "weaponType": "Hammer",
+        "damage": 10,
+        "attackSpeed": 0.8,
+        "weight": 8.0,
+        "description": "A surprisingly heavy hammer made from dense hardwood.",
+        "iconSpriteName": "wood_heavy_hammer"
       }
       
     ]
