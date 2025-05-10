@@ -6,6 +6,7 @@ using System.Collections; // Pour les Coroutines
 public class MonsterAI : MonoBehaviour
 {
     [Header("References")]
+
     public Animator animator;
     public PathfindingAStar pathfinder; // Référence au script de pathfinding
     public Transform playerTransform; // Référence directe au Transform du joueur
@@ -31,6 +32,7 @@ public class MonsterAI : MonoBehaviour
     // Ajoutez des stats de monstre ici (PV, dégâts, etc.)
 
     private Vector2 lastMovementDirectionForAnim;
+
 
 
     void Start()
@@ -231,4 +233,6 @@ public class MonsterAI : MonoBehaviour
             animator.SetFloat("MoveY", lastMovementDirectionForAnim.y); // Pour que l'idle soit orienté
         }
     }
+
+  
 }
