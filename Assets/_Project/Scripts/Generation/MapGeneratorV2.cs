@@ -986,5 +986,9 @@ void PlaceDecorations()
         return availableTiles[Random.Range(0, availableTiles.Count)];
     }
 
-
+public bool IsTileWithinBounds(int x, int y)
+{
+    // mapWidth et mapHeight doivent être les dimensions de votre grille de données (par exemple, ElevationData)
+    return x >= 0 && x < mapWidth && y >= 0 && y < mapHeight;
+}
 }

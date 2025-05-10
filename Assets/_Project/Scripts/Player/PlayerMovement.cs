@@ -533,4 +533,10 @@ public class PlayerMovement : MonoBehaviour
         elevation = mapGenerator.ElevationData[tilePos.x, tilePos.y];
         return true;
     }
+
+
+    public int GetCurrentElevation()
+{
+    return currentPlayerElevation;
+}
 }
