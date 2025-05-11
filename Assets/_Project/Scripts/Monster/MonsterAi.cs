@@ -22,7 +22,7 @@ public class MonsterAI : MonoBehaviour
     private int currentMonsterElevation = 0; // Initialiser correctement au spawn
 
     [Header("Pathfinding Settings")]
-    public float pathRefreshRate = 1.0f; // Recalculer le chemin toutes les X secondes
+    public float pathRefreshRate = 0.1f; // Recalculer le chemin toutes les X secondes
     private float pathRefreshTimer;
 
     [Header("Attack Settings")]
@@ -50,7 +50,7 @@ public class MonsterAI : MonoBehaviour
             }
         }
         if (mapGenerator == null){
-            Debug.Log("mapGenerator not found");
+            
              mapGenerator = FindFirstObjectByType<MapGeneratorV2>();
         }
 
@@ -95,7 +95,7 @@ public class MonsterAI : MonoBehaviour
             if (isMovingOnPath) StopMovement();
         }
         // 2. Se déplacer si pas en train d'attaquer (ou si l'attaque n'interrompt pas le mouvement)
-        else if (!isMovingOnPath || (isMovingOnPath && currentPath == null)) // Si pas en mouvement ou si le chemin est nul
+        else if (true) // Si pas en mouvement ou si le chemin est nul (!isMovingOnPath || (isMovingOnPath && currentPath == null))
         {
             pathRefreshTimer -= Time.deltaTime;
             if (pathRefreshTimer <= 0)
