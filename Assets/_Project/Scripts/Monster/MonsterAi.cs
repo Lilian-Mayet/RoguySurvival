@@ -49,7 +49,10 @@ public class MonsterAI : MonoBehaviour
                 playerMovementScript = playerObj.GetComponent<PlayerMovement>();
             }
         }
-        if (mapGenerator == null) mapGenerator = FindFirstObjectByType<MapGeneratorV2>();
+        if (mapGenerator == null){
+            Debug.Log("mapGenerator not found");
+             mapGenerator = FindFirstObjectByType<MapGeneratorV2>();
+        }
 
 
         if (animator == null || pathfinder == null || playerTransform == null || playerMovementScript == null || mapGenerator == null)
@@ -111,87 +114,102 @@ public class MonsterAI : MonoBehaviour
     }
 
     void RequestNewPath()
-    {
-        if (pathfinder == null || playerTransform == null || playerMovementScript == null) return;
+            {
+                if (pathfinder == null || playerTransform == null || playerMovementScript == null) return;
 
-        Vector3Int playerTile = mapGenerator.groundLayer.WorldToCell(playerTransform.position);
-        int playerElevation = playerMovementScript.GetCurrentElevation(); // Vous devrez ajouter cette méthode à PlayerMovement
+                Vector3Int playerTile = mapGenerator.groundLayer.WorldToCell(playerTransform.position);
+                int playerElevation = playerMovementScript.GetCurrentElevation();
 
-        // Mettre à jour la tuile et l'élévation actuelles du monstre avant de chercher un chemin
-        currentLogicalTile = mapGenerator.groundLayer.WorldToCell(transform.position);
-        if(mapGenerator.IsTileWithinBounds(currentLogicalTile.x, currentLogicalTile.y))
-            currentMonsterElevation = mapGenerator.ElevationData[currentLogicalTile.x, currentLogicalTile.y];
+                currentLogicalTile = mapGenerator.groundLayer.WorldToCell(transform.position);
+                if(mapGenerator.IsTileWithinBounds(currentLogicalTile.x, currentLogicalTile.y))
+                    currentMonsterElevation = mapGenerator.ElevationData[currentLogicalTile.x, currentLogicalTile.y];
 
 
-        List<Vector3Int> newPath = pathfinder.FindPath(currentLogicalTile, currentMonsterElevation, playerTile, playerElevation);
+                // Appel de la nouvelle méthode principale de pathfinding
+                List<Vector3Int> newPath = pathfinder.FindOverallPath(currentLogicalTile, currentMonsterElevation, playerTile, playerElevation);
 
-        if (newPath != null && newPath.Count > 1) // > 1 car le premier nœud est la position actuelle
-        {
-            currentPath = newPath;
-            currentPathIndex = 1; // Commencer à se déplacer vers le premier nœud *après* le départ
-            isMovingOnPath = true;
-            // Debug.Log($"Monster {gameObject.name}: New path found with {currentPath.Count} nodes.");
-        }
-        else
-        {
-            // Debug.LogWarning($"Monster {gameObject.name}: No path found or path too short.");
-            StopMovement(); // Arrêter si aucun chemin n'est trouvé
-        }
-    }
+                if (newPath != null && newPath.Count > 1)
+                {
+                    currentPath = newPath;
+                    currentPathIndex = 1;
+                    isMovingOnPath = true;
+                }
+                else
+                {
+                    StopMovement();
+                }
+            }
 
     void HandleMovementOnPath()
-    {
-        if (!isMovingOnPath || currentPath == null || currentPathIndex >= currentPath.Count)
         {
-            if (isMovingOnPath) StopMovement(); // Chemin terminé ou invalide
-            return;
-        }
-
-        Vector3Int targetTileInPath = currentPath[currentPathIndex];
-        Vector3 targetWorldPosition = mapGenerator.groundLayer.GetCellCenterWorld(targetTileInPath);
-
-        // Déterminer l'élévation de la prochaine tuile du chemin (pour le mouvement)
-        // La logique de PathfindingAStar::IsMonsterMoveValid devrait déjà s'être assurée que c'est un pas valide.
-        // On peut recalculer l'élévation de la cible pour être sûr.
-        int nextStepElevation = currentMonsterElevation; // Par défaut
-        if(mapGenerator.IsTileWithinBounds(targetTileInPath.x, targetTileInPath.y)){
-             // La logique IsMonsterMoveValid du pathfinder devrait avoir validé cette transition.
-             // Pour simplifier ici, on prend l'elevation data de la tuile cible.
-             // Une logique plus robuste vérifierait la transition d'élévation.
-            nextStepElevation = mapGenerator.ElevationData[targetTileInPath.x, targetTileInPath.y];
-
-            // Cas spécial: si la tuile cible est un pont et que le monstre est à L0,
-            // mais que le chemin l'a fait passer sous le pont, son élévation reste L0.
-            // Si le chemin l'a fait passer SUR le pont, son élévation devient L1.
-            // La 'targetElevation' de IsMonsterMoveValid dans le pathfinder devrait avoir géré cela.
-            // On pourrait stocker l'élévation prévue pour chaque nœud du chemin si nécessaire.
-            // Pour l'instant, on fait une supposition simple.
-            if (mapGenerator.bridgeLayer.GetTile(targetTileInPath) != null) {
-                if (currentMonsterElevation == 1) nextStepElevation = 1; // Sur le pont
-                else nextStepElevation = 0; // Sous le pont
-            }
-        }
-
-
-        Vector3 direction = (targetWorldPosition - transform.position).normalized;
-        Vector3 newPosition = Vector3.MoveTowards(transform.position, targetWorldPosition, moveSpeed * Time.fixedDeltaTime);
-        GetComponent<Rigidbody2D>().MovePosition(newPosition); // Si vous utilisez un Rigidbody2D Kinematic
-
-        UpdateAnimator(direction);
-
-        // Vérifier si on est arrivé à la tuile cible du chemin
-        if (Vector3.Distance(transform.position, targetWorldPosition) < 0.1f)
-        {
-            transform.position = targetWorldPosition; // Snap à la tuile
-            currentLogicalTile = targetTileInPath;
-            currentMonsterElevation = nextStepElevation; // Mettre à jour l'élévation
-            currentPathIndex++;
-            if (currentPathIndex >= currentPath.Count)
+            if (!isMovingOnPath || currentPath == null || currentPathIndex >= currentPath.Count)
             {
-                StopMovement(); // Fin du chemin
+                if (isMovingOnPath) StopMovement();
+                return;
+            }
+
+            Vector3Int targetTileInPath = currentPath[currentPathIndex];
+            Vector3 targetWorldPosition = mapGenerator.groundLayer.GetCellCenterWorld(targetTileInPath);
+            
+            // Déterminer l'élévation où le monstre sera après ce pas.
+            // La logique de FindOverallPath et IsMonsterMoveValid devrait déjà avoir planifié cela.
+            // On peut essayer de la déduire pour mettre à jour currentMonsterElevation correctement.
+            int nextStepElevation = currentMonsterElevation; // Supposition initiale
+            
+            // Si on est sur une tuile qui est une entrée/sortie d'escalier connue,
+            // et que la tuile suivante du chemin est de l'autre côté de cet escalier,
+            // alors l'élévation change.
+            // Cette logique est complexe à déduire ici sans avoir les PathNodes complets.
+            // Pour l'instant, on va se fier à l'ElevationData de la tuile cible,
+            // en espérant que le pathfinding a correctement géré les transitions d'escalier.
+            // Une solution plus robuste serait que FindOverallPath retourne des PathNodes avec l'élévation prévue.
+            if (mapGenerator.IsTileWithinBounds(targetTileInPath.x, targetTileInPath.y))
+            {
+                int targetDataElevation = mapGenerator.ElevationData[targetTileInPath.x, targetTileInPath.y];
+                bool targetIsStair = mapGenerator.stairsLayer.GetTile(targetTileInPath) != null;
+                bool targetIsBridge = mapGenerator.bridgeLayer.GetTile(targetTileInPath) != null;
+
+                // Logique simplifiée pour la mise à jour de l'élévation du monstre pendant le mouvement
+                if (targetIsStair) { // Si la cible est une tuile d'escalier
+                    // On est monté si on était L0 et l'escalier L0 mène à L1
+                    // Ou on est descendu si on était L1 sur plateforme et l'escalier L0 est la cible
+                    // Cela a dû être validé par IsMonsterMoveValid.
+                    // On prend l'ElevationData comme indicateur brut, mais ce n'est pas parfait.
+                    // Exemple: si currentMonsterElevation est 0 et on va sur un escalier (data 0) qui monte à L1,
+                    // alors nextStepElevation devrait devenir 1.
+                    // Pour une logique plus simple ici, on va se fier à IsMonsterMoveValid du pathfinder
+                    // qui aurait dû déterminer la targetMonsterActualElevation
+                    // Pour l'instant, on va prendre l'elevation data de la tuile, et ajuster pour les ponts.
+                    nextStepElevation = targetDataElevation;
+                    if (targetIsBridge && targetDataElevation == 1) nextStepElevation = 1; // Sur un pont, c'est L1
+                    else if (targetIsBridge && targetDataElevation == 0) nextStepElevation = 0; // Devrait pas arriver, mais pour être sûr sous un pont L0
+                    // La logique d'escalier dans IsMonsterMoveValid du pathfinder est la clé pour le *calcul* du chemin.
+                    // Ici, on essaie de *refléter* ce changement.
+                } else if (targetIsBridge) {
+                    nextStepElevation = 1; // Si on est sur un pont, on est à L1
+                } else {
+                    nextStepElevation = targetDataElevation; // Sol normal
+                }
+            }
+
+
+            Vector3 direction = (targetWorldPosition - transform.position).normalized;
+            Vector3 newPosition = Vector3.MoveTowards(transform.position, targetWorldPosition, moveSpeed * Time.fixedDeltaTime);
+            GetComponent<Rigidbody2D>().MovePosition(newPosition);
+            UpdateAnimator(direction);
+
+            if (Vector3.Distance(transform.position, targetWorldPosition) < 0.1f)
+            {
+                transform.position = targetWorldPosition;
+                currentLogicalTile = targetTileInPath;
+                currentMonsterElevation = nextStepElevation; // MISE A JOUR IMPORTANTE
+                currentPathIndex++;
+                if (currentPathIndex >= currentPath.Count)
+                {
+                    StopMovement();
+                }
             }
         }
-    }
 
     void StopMovement()
     {
