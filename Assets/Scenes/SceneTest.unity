@@ -334,6 +334,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 283780921}
   m_CullTransparentMesh: 1
+--- !u!1 &437101447 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6061322887578013367, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
+  m_PrefabInstance: {fileID: 4380278857531546436}
+  m_PrefabAsset: {fileID: 0}
+--- !u!50 &437101452
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437101447}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!1 &638169455
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,8 +576,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e970c93bb04201145a4a2fc02d5f6755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapGenerator: {fileID: 0}
-  playerMovementScript: {fileID: 0}
+  mapGenerator: {fileID: 638169458}
+  playerMovementScript: {fileID: 1089949084}
 --- !u!4 &822583046
 Transform:
   m_ObjectHideFlags: 0
@@ -1167,7 +1199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b61a4542fe283974a95ae28f96b2b878, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2.5
+  moveSpeed: 3
   collisionSkinWidth: 1
   mapGenerator: {fileID: 638169458}
   playerSpriteRenderer: {fileID: 1089949086}
@@ -1372,6 +1404,9 @@ MonoBehaviour:
   healthFullColor: {r: 0, g: 1, b: 0, a: 1}
   healthMidColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   healthLowColor: {r: 1, g: 0, b: 0, a: 1}
+  monsterPrefab: {fileID: 6061322887578013367, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
+  spawnRadius: 10
+  maxSpawnAttempts: 20
 --- !u!1 &1141025277
 GameObject:
   m_ObjectHideFlags: 0
@@ -2287,11 +2322,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4337289250478473518, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 358.59198
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4337289250478473518, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 59.5962
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4337289250478473518, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2348,7 +2383,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6061322887578013367, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 437101452}
   m_SourcePrefab: {fileID: 100100000, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

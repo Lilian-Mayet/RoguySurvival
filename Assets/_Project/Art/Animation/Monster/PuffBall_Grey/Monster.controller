@@ -118,7 +118,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MonsterName_Walk_RightDown
+  m_Name: MonsterName_Walk_Right
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -132,7 +132,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 5e9e9134a823cb94c9c9fe439c166b20, type: 2}
+  m_Motion: {fileID: 7400000, guid: 08b54f8a9fb5dde4c8b75c974dbfa14c, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
