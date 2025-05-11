@@ -123,6 +123,7 @@ public class MonsterAI : MonoBehaviour
                 currentLogicalTile = mapGenerator.groundLayer.WorldToCell(transform.position);
                 if(mapGenerator.IsTileWithinBounds(currentLogicalTile.x, currentLogicalTile.y))
                     currentMonsterElevation = mapGenerator.ElevationData[currentLogicalTile.x, currentLogicalTile.y];
+                    Debug.Log("Monster currently one level : " + currentMonsterElevation);
 
 
                 // Appel de la nouvelle méthode principale de pathfinding

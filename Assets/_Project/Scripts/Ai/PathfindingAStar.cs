@@ -23,6 +23,7 @@ public class PathfindingAStar : MonoBehaviour
             Debug.LogError("PathfindingAStar: Critical references (MapGenerator, ElevationData, or StairsLayer) not set!");
             return null;
         }
+        Debug.Log($"[FindOverallPath] All critical references seem OK. Monster L{startElevation}, Player L{playerElevation}");
 
         if (startElevation == playerElevation)
         {
@@ -128,81 +129,116 @@ public class PathfindingAStar : MonoBehaviour
     // toElevation: élévation que le monstre veut atteindre
     // out stairAccessPoint: la tuile que le monstre doit atteindre pour INITIATE la transition
     // out stairDestinationPoint: la tuile où le monstre EMERGE après la transition
-    private void FindClosestStairToTransition(Vector3Int fromTile, int fromElevation, int toElevation,
-                                           out Vector3Int? stairAccessPoint, out Vector3Int? stairDestinationPoint)
-    {
+    private void FindClosestStairToTransition(Vector3Int fromTile, int fromElevation, int toElevation,out Vector3Int? stairAccessPoint, out Vector3Int? stairDestinationPoint){
         stairAccessPoint = null;
         stairDestinationPoint = null;
         float minDistanceSq = float.MaxValue;
+        int stairsEvaluated = 0;
 
-        // Parcourir une zone limitée autour de 'fromTile' pour trouver des escaliers
-        for (int x = fromTile.x - stairSearchRadius; x <= fromTile.x + stairSearchRadius; x++)
+        // Debug.Log($"[FindClosestStair] Search: From {fromTile} (L{fromElevation}) to L{toElevation}. Radius: {stairSearchRadius}");
+
+        for (int xOffset = -stairSearchRadius; xOffset <= stairSearchRadius; xOffset++)
         {
-            for (int y = fromTile.y - stairSearchRadius; y <= fromTile.y + stairSearchRadius; y++)
+            for (int yOffset = -stairSearchRadius; yOffset <= stairSearchRadius; yOffset++)
             {
-                Vector3Int currentTilePos = new Vector3Int(x, y, 0);
-                if (!mapGenerator.IsTileWithinBounds(currentTilePos.x,currentTilePos.y)) continue;
+                Vector3Int potentialStairPos = new Vector3Int(fromTile.x + xOffset, fromTile.y + yOffset, 0);
 
-                TileBase stairTile = mapGenerator.stairsLayer.GetTile(currentTilePos);
-                if (stairTile == null) continue; // Ce n'est pas une tuile d'escalier
+                if (!mapGenerator.IsTileWithinBounds(potentialStairPos.x,potentialStairPos.y)) continue;
 
-                int stairTileDataElevation = mapGenerator.ElevationData[x, y];
+                TileBase tileOnStairLayer = mapGenerator.stairsLayer.GetTile(potentialStairPos);
 
-                if (fromElevation == 0 && toElevation == 1) // Veut monter L0 -> L1
+                if (tileOnStairLayer == mapGenerator.stair_S_Tile) // C'est une tuile d'escalier que nous avons placée
                 {
-                    // L'escalier lui-même doit être à L0
-                    if (stairTileDataElevation == 0)
+                    stairsEvaluated++;
+                    // Selon votre nouvelle information, stairTileDataElevation sera TOUJOURS 1 pour un stair_S_Tile
+                    int stairTileDataElevation = mapGenerator.ElevationData[potentialStairPos.x, potentialStairPos.y];
+
+
+
+                    // CAS 1: Monstre à L0 veut MONTER à L1
+                    // Le monstre doit atteindre la tuile d'escalier (qui est L1 data) depuis une tuile L0 adjacente.
+                    if (fromElevation == 0 && toElevation == 1)
                     {
-                        // Vérifier si cet escalier mène bien à une plateforme L1 (logique spécifique à vos escaliers)
-                        // Ex: pour un escalier "Sud" (monte vers le Nord)
-                        Vector3Int platformAbove = new Vector3Int(x, y + 1, 0);
-                        if (mapGenerator.IsTileWithinBounds(platformAbove.x,platformAbove.y) && mapGenerator.ElevationData[platformAbove.x, platformAbove.y] == 1 &&
-                            (mapGenerator.groundLayer.GetTile(platformAbove) != null || mapGenerator.bridgeLayer.GetTile(platformAbove) != null))
+                        // La tuile d'escalier (potentialStairPos) est à L1 (data).
+                        // Le monstre doit être sur une tuile L0 adjacente pour y accéder.
+                        // Pour un stair_S_Tile, la case d'accès depuis L0 est au SUD de l'escalier.
+                        Vector3Int accessFromL0Pos = new Vector3Int(potentialStairPos.x, potentialStairPos.y - 1, 0);
+
+                        if (mapGenerator.IsTileWithinBounds(accessFromL0Pos.x,accessFromL0Pos.y) &&
+                            mapGenerator.ElevationData[accessFromL0Pos.x, accessFromL0Pos.y] == 0 && // Case d'accès est L0
+                            (mapGenerator.groundLayer.GetTile(accessFromL0Pos) != null)) // Et il y a du sol
                         {
-                            float distSq = (currentTilePos - fromTile).sqrMagnitude;
-                            if (distSq < minDistanceSq)
+                            // La plateforme de destination à L1 est AU-DESSUS (Nord) de la tuile d'escalier L1.
+                            // (Note: si stair_S_Tile est déjà L1, la "plateforme" est la tuile où l'escalier se termine,
+                            // qui pourrait être une autre tuile de pont/sol à L1, ou le monstre est déjà "sur" l'escalier à L1).
+                            // Si stair_S_Tile est la *dernière* tuile de l'escalier en montant, alors la destination
+                            // est la tuile adjacente au niveau 1.
+                            // Pour un stair_S (qui monte vers le Nord), la sortie est au Nord de la tuile d'escalier.
+                            Vector3Int platformDestinationL1 = new Vector3Int(potentialStairPos.x, potentialStairPos.y + 1, 0);
+
+                            if (mapGenerator.IsTileWithinBounds(platformDestinationL1.x,platformDestinationL1.y) &&
+                                mapGenerator.ElevationData[platformDestinationL1.x, platformDestinationL1.y] == 1 &&
+                                (mapGenerator.groundLayer.GetTile(platformDestinationL1) != null || (mapGenerator.bridgeLayer != null && mapGenerator.bridgeLayer.GetTile(platformDestinationL1) != null)))
                             {
-                                minDistanceSq = distSq;
-                                stairAccessPoint = currentTilePos;      // Le monstre va à la tuile d'escalier L0
-                                stairDestinationPoint = platformAbove;  // Il sortira sur la plateforme L1
+                                // Cet escalier est valide pour monter.
+                                // Le monstre doit d'abord aller à `accessFromL0Pos` (qui est L0),
+                                // puis le pas suivant le mènera sur `potentialStairPos` (la tuile d'escalier, qui est L1 data),
+                                // et il émergera conceptuellement à `platformDestinationL1` ou continuera sur d'autres tuiles d'escalier L1.
+
+                                // Le point que le pathfinding A* (pour le segment L0) doit viser est `accessFromL0Pos`.
+                                // Mais l'escalier pertinent est `potentialStairPos`.
+                                // On va considérer que le `stairAccessPoint` est la tuile d'escalier elle-même,
+                                // et `IsMonsterMoveValid` gérera le pas depuis `accessFromL0Pos` vers `potentialStairPos`.
+                                float distSq = (potentialStairPos - fromTile).sqrMagnitude; // Distance jusqu'à la tuile d'escalier L1 elle-même
+                                if (distSq < minDistanceSq)
+                                {
+                                    minDistanceSq = distSq;
+                                    stairAccessPoint = potentialStairPos;      // Viser la tuile d'escalier L1
+                                    stairDestinationPoint = platformDestinationL1;  // Sortir sur la plateforme L1 au nord
+                                }
                             }
                         }
                     }
-                }
-                else if (fromElevation == 1 && toElevation == 0) // Veut descendre L1 -> L0
-                {
-                    // Le monstre est à L1. Il cherche une tuile de "plateforme" (currentTilePos) qui est L1
-                    // et qui est directement connectée à une tuile d'escalier en dessous (L0).
-                    if (stairTileDataElevation == 1) // La tuile que nous scannons (currentTilePos) doit être la plateforme L1
+                    // CAS 2: Monstre à L1 veut DESCENDRE à L0
+                    // Le monstre est sur une plateforme L1 et cherche une tuile d'escalier (L1 data) qui mène à L0.
+                    else if (fromElevation == 1 && toElevation == 0)
                     {
-                         // Vérifier si la tuile EN DESSOUS (Sud pour un escalier Sud) est une tuile d'escalier L0
-                        Vector3Int stairBelow = new Vector3Int(x, y - 1, 0); // Pour un escalier Sud, on descend vers le Sud
-                        if (mapGenerator.IsTileWithinBounds(stairBelow.x,stairBelow.y) &&
-                            mapGenerator.stairsLayer.GetTile(stairBelow) != null &&
-                            mapGenerator.ElevationData[stairBelow.x, stairBelow.y] == 0)
+                        // `potentialStairPos` est la tuile d'escalier (L1 data).
+                        // Pour un stair_S_Tile (qui monte vers le Nord), on y accède depuis une plateforme L1 au Nord
+                        // pour descendre vers une tuile L0 au Sud.
+                        Vector3Int platformAccessL1 = new Vector3Int(potentialStairPos.x, potentialStairPos.y + 1, 0); // Plateforme au Nord de l'escalier
+                        Vector3Int destinationL0 = new Vector3Int(potentialStairPos.x, potentialStairPos.y - 1, 0);    // Sortie L0 au Sud de l'escalier
+
+                        // Vérifier si la plateforme d'accès est valide (L1) et si la destination L0 est valide.
+                        if (mapGenerator.IsTileWithinBounds(platformAccessL1.x,platformAccessL1.y) &&
+                            mapGenerator.ElevationData[platformAccessL1.x, platformAccessL1.y] == 1 && // Plateforme d'accès est L1
+                            (mapGenerator.groundLayer.GetTile(platformAccessL1) != null || (mapGenerator.bridgeLayer != null && mapGenerator.bridgeLayer.GetTile(platformAccessL1) != null)) &&
+                            mapGenerator.IsTileWithinBounds(destinationL0.x,destinationL0.y) &&
+                            mapGenerator.ElevationData[destinationL0.x, destinationL0.y] == 0 && // Destination est L0
+                            (mapGenerator.groundLayer.GetTile(destinationL0) != null)) // Et il y a du sol
                         {
-                            float distSq = (currentTilePos - fromTile).sqrMagnitude;
+                            // Le monstre doit d'abord aller à `platformAccessL1`.
+                            // Le "pas" suivant le mènera sur `potentialStairPos` (l'escalier L1),
+                            // et il émergera à `destinationL0`.
+
+                            // On vise la tuile d'escalier `potentialStairPos` (qui est L1 data),
+                            // en s'assurant qu'on vient de `platformAccessL1`.
+                            float distSq = (potentialStairPos - fromTile).sqrMagnitude; // Distance jusqu'à la tuile d'escalier L1
                             if (distSq < minDistanceSq)
                             {
                                 minDistanceSq = distSq;
-                                stairAccessPoint = currentTilePos;      // Le monstre va à la plateforme L1
-                                stairDestinationPoint = stairBelow;     // Il sortira sur la tuile d'escalier L0
+                                stairAccessPoint = potentialStairPos;      // Viser la tuile d'escalier L1
+                                stairDestinationPoint = destinationL0;    // Sortir sur la tuile L0 au sud
                             }
                         }
                     }
                 }
             }
-        }
-    }
-
-    // ... (FindDirectPath, CreateNodeFromWorldTile, IsMonsterMoveValid, GetNeighbourOffsets, RetracePath) ...
-    // IsMonsterMoveValid doit être mis à jour pour gérer correctement la traversée d'escalier
-    // identifiée par FindClosestStairToTransition.
-
-    // Dans IsMonsterMoveValid, la logique d'escalier doit être plus précise :
-    private bool IsMonsterMoveValid(Vector2Int currentMonsterGridPos, int currentMonsterActualElevation, Vector2Int targetGridPos, out int targetMonsterActualElevation)
-    {
-        targetMonsterActualElevation = currentMonsterActualElevation; // Valeur par défaut
+            // ... (logs de debug finaux) ...
+        }}
+        // Dans IsMonsterMoveValid, la logique d'escalier doit être plus précise :
+    private bool IsMonsterMoveValid(Vector2Int currentMonsterGridPos, int currentMonsterActualElevation, Vector2Int targetGridPos, out int targetMonsterActualElevation){
+        targetMonsterActualElevation = currentMonsterActualElevation;
         if (!mapGenerator.IsTileWithinBounds(targetGridPos.x, targetGridPos.y)) return false;
 
         Vector3Int currentWorldTile = new Vector3Int(currentMonsterGridPos.x, currentMonsterGridPos.y, 0);
@@ -212,79 +248,98 @@ public class PathfindingAStar : MonoBehaviour
         if (mapGenerator.wallsLayer.GetTile(targetWorldTile) != null) return false;
         
         TileBase groundOnTarget = mapGenerator.groundLayer.GetTile(targetWorldTile);
-        TileBase bridgeOnTarget = mapGenerator.bridgeLayer.GetTile(targetWorldTile);
+        TileBase bridgeOnTarget = (mapGenerator.bridgeLayer != null) ? mapGenerator.bridgeLayer.GetTile(targetWorldTile) : null;
         TileBase stairsOnTarget = mapGenerator.stairsLayer.GetTile(targetWorldTile);
-        TileBase stairsOnCurrent = mapGenerator.stairsLayer.GetTile(currentWorldTile);
-
 
         if (groundOnTarget == null && bridgeOnTarget == null && stairsOnTarget == null) return false;
 
         // 1. Transition d'escalier en MONTANT (L0 -> L1)
-        if (currentMonsterActualElevation == 0 && stairsOnTarget != null && targetTileDataElevation == 0)
+        // Monstre est à L0 (currentMonsterActualElevation == 0).
+        // Cible est une tuile stair_S_Tile (qui a ElevationData == 1).
+        // La tuile actuelle (currentWorldTile) doit être la case L0 juste EN DESSOUS (Sud) de l'escalier stair_S_Tile.
+        if (currentMonsterActualElevation == 0 && stairsOnTarget == mapGenerator.stair_S_Tile && targetTileDataElevation == 1)
         {
-            Vector3Int platformAbove = new Vector3Int(targetGridPos.x, targetGridPos.y + 1, 0); // Pour escalier Sud
-            if (mapGenerator.IsTileWithinBounds(platformAbove.x,platformAbove.y) && mapGenerator.ElevationData[platformAbove.x, platformAbove.y] == 1 &&
-                (mapGenerator.groundLayer.GetTile(platformAbove) != null || mapGenerator.bridgeLayer.GetTile(platformAbove) != null))
+            // Vérifier que la tuile actuelle est bien la case d'accès L0 pour cet escalier L1
+            // Pour stair_S_Tile à (targetGridPos.x, targetGridPos.y), la case d'accès L0 est (targetGridPos.x, targetGridPos.y - 1)
+            if (currentMonsterGridPos.x == targetGridPos.x && currentMonsterGridPos.y == targetGridPos.y - 1)
             {
-                targetMonsterActualElevation = 1; // Le monstre va être à L1
-                return true;
+                // Vérifier aussi que la "sortie" de l'escalier en haut est valide
+                Vector3Int platformExitL1 = new Vector3Int(targetGridPos.x, targetGridPos.y + 1, 0);
+                if (mapGenerator.IsTileWithinBounds(platformExitL1.x,platformExitL1.y) && mapGenerator.ElevationData[platformExitL1.x, platformExitL1.y] == 1)
+                {
+                    targetMonsterActualElevation = 1; // Le monstre monte et sera à L1 sur la tuile d'escalier
+                    return true;
+                }
             }
         }
 
         // 2. Transition d'escalier en DESCENDANT (L1 -> L0)
-        // Le monstre est sur une plateforme L1 (current) et la cible est une tuile d'escalier L0 (target)
-        if (currentMonsterActualElevation == 1 && stairsOnTarget != null && targetTileDataElevation == 0)
+        // Monstre est à L1 (currentMonsterActualElevation == 1).
+        // Cible est une tuile stair_S_Tile (qui a ElevationData == 1).
+        // La tuile actuelle (currentWorldTile) doit être la plateforme L1 juste AU-DESSUS (Nord) de l'escalier stair_S_Tile.
+        if (currentMonsterActualElevation == 1 && stairsOnTarget == mapGenerator.stair_S_Tile && targetTileDataElevation == 1)
         {
-            // Vérifier si la tuile actuelle (plateforme L1) est bien la "sortie haute" de l'escalier cible
-            // Ex: pour escalier Sud, current est (target.x, target.y + 1)
+            // Vérifier que la tuile actuelle est bien la plateforme d'accès L1 pour cet escalier
+            // Pour stair_S_Tile à (targetGridPos.x, targetGridPos.y), la plateforme d'accès L1 est (targetGridPos.x, targetGridPos.y + 1)
             if (currentMonsterGridPos.x == targetGridPos.x && currentMonsterGridPos.y == targetGridPos.y + 1)
             {
-                targetMonsterActualElevation = 0; // Le monstre va être à L0
+                // Vérifier que la "sortie" de l'escalier en bas (L0) est valide
+                Vector3Int groundExitL0 = new Vector3Int(targetGridPos.x, targetGridPos.y - 1, 0);
+                if (mapGenerator.IsTileWithinBounds(groundExitL0.x,groundExitL0.y) && mapGenerator.ElevationData[groundExitL0.x, groundExitL0.y] == 0 &&
+                    mapGenerator.groundLayer.GetTile(groundExitL0) != null)
+                {
+                    targetMonsterActualElevation = 0; // Le monstre descend et sera à L0 après avoir "traversé" l'escalier
+                                                    // Note: il atterrit sur `groundExitL0`. Le pas actuel le met sur `stairsOnTarget` mais son élévation conceptuelle change.
+                    return true;
+                }
+            }
+        }
+
+        // 3. Mouvement sur Pont (les ponts sont L1)
+        if (bridgeOnTarget != null && targetTileDataElevation == 1)
+        {
+            if (currentMonsterActualElevation == 1) { targetMonsterActualElevation = 1; return true; } // L1 sur L1 pont
+            // Si L0 essayant d'aller sur un pont L1 => invalide (sauf si c'est un escalier, déjà géré)
+            return false;
+        }
+        // Mouvement sous un pont (monstre L0, la tuile cible a un pont L1 au-dessus, mais on vérifie le sol L0)
+        if (currentMonsterActualElevation == 0 && bridgeOnTarget != null && targetTileDataElevation == 1) {
+            // Le pont est à L1. Si on est L0, on vérifie s'il y a du sol L0 à la même coordonnée.
+            // L'ElevationData de la coordonnée (x,y) sera 1 à cause du pont.
+            // On doit vérifier le groundLayer à (x,y) ET que son ElevationData est 0.
+            if (mapGenerator.groundLayer.GetTile(targetWorldTile) != null && 
+                mapGenerator.ElevationData[targetWorldTile.x, targetWorldTile.y] == 0) // Méthode hypothétique
+            {
+                targetMonsterActualElevation = 0; return true;
+            }
+            // S'il n'y a pas de "ElevationDataForGroundOnly", on peut supposer que si un pont est là (ElevationData=1)
+            // et que groundLayer a une tuile, cette tuile de sol DOIT être L0 pour qu'on passe dessous.
+            // Mais mapGenerator.ElevationData[x,y] sera 1. Il faut une info séparée ou une convention.
+            // Pour l'instant, on va dire que si on est L0 et la cible est un pont (donc targetTileDataElevation = 1), on ne peut pas y aller.
+            // Le pathfinder aurait dû nous faire passer sur une tuile de sol L0 si elle existe.
+            return false; // Ne peut pas marcher sur un pont depuis L0, ni sur le vide sous un pont.
+        }
+
+
+        // 4. Mouvement sur Sol Normal ou sur une tuile d'escalier sans changer de niveau (ex: se déplacer latéralement sur un large escalier)
+        if (targetTileDataElevation == currentMonsterActualElevation)
+        {
+            // Si la cible est une tuile d'escalier (L1 data) et que le monstre est déjà à L1, c'est ok.
+            if (stairsOnTarget == mapGenerator.stair_S_Tile && currentMonsterActualElevation == 1) {
+                targetMonsterActualElevation = 1;
+                return true;
+            }
+            // Si ce n'est pas un escalier ou si c'est un escalier mais que l'élévation correspond déjà, c'est du sol/plateforme normal.
+            if (stairsOnTarget != mapGenerator.stair_S_Tile) {
+                targetMonsterActualElevation = currentMonsterActualElevation;
                 return true;
             }
         }
-
-        // 3. Mouvement sur Pont
-        if (bridgeOnTarget != null)
-        {
-            if (currentMonsterActualElevation == 1 && targetTileDataElevation == 1) { targetMonsterActualElevation = 1; return true; } // Sur le pont
-            else if (currentMonsterActualElevation == 0 && targetTileDataElevation == 1) // Sous un pont
-            {
-                 if (groundOnTarget != null && mapGenerator.ElevationData[targetGridPos.x, targetGridPos.y] == 0) // Sol L0 sous le pont
-                 { targetMonsterActualElevation = 0; return true; } // On suppose que ElevationData pour un pont est 1. Si sol en dessous, ElevationData de la tuile (x,y) sera 0.
-                 // Correction : si targetTileDataElevation est 1 (c'est un pont), mais le sol en dessous est L0.
-                 // La tile (x,y) a une ElevationData de 1 à cause du pont.
-                 // Il faut vérifier la tuile de sol à (x,y) et son ElevationData propre.
-                 // Le plus simple: si currentMonsterActualElevation == 0 et bridgeOnTarget != null (signifie qu'il y a un pont au-dessus),
-                 // alors le mouvement n'est valide que s'il y a du sol à L0.
-                 if (mapGenerator.groundLayer.GetTile(targetWorldTile) != null && mapGenerator.ElevationData[targetWorldTile.x, targetWorldTile.y] == 0) {
-                     targetMonsterActualElevation = 0;
-                     return true;
-                 }
-                 return false;
-            }
-             // Si currentMonsterActualElevation est 1 et targetTileDataElevation est 0 (et ce n'est pas un escalier), c'est une falaise.
-            else if (currentMonsterActualElevation == 1 && targetTileDataElevation == 0 && stairsOnTarget == null) return false;
-        }
-
-        // 4. Mouvement sur Sol Normal (pas un escalier en transition, pas un pont)
-        if (targetTileDataElevation == currentMonsterActualElevation)
-        {
-            // S'assurer qu'on ne descend pas d'un pont vers du sol si on était L1 sur un pont
-            if (mapGenerator.bridgeLayer.GetTile(currentWorldTile) != null && currentMonsterActualElevation == 1 && targetTileDataElevation == 1) {
-                // On est sur un pont et on reste à L1 (potentiellement vers une autre tuile de pont ou une plateforme L1)
-            } else if (mapGenerator.bridgeLayer.GetTile(currentWorldTile) != null && currentMonsterActualElevation == 1 && targetTileDataElevation == 0) {
-                 return false; // Tombe d'un pont
-            }
-            targetMonsterActualElevation = currentMonsterActualElevation;
-            return true;
-        }
         
-        return false; // Changement d'élévation non géré (falaise) ou autre cas non couvert
-    }
+        return false;
+    }  
 
-    public List<Vector3Int> FindPath(Vector3Int startWorldTile, int startElevation, Vector3Int endWorldTile, int endElevation)
-    {
+  public List<Vector3Int> FindPath(Vector3Int startWorldTile, int startElevation, Vector3Int endWorldTile, int endElevation){
         if (mapGenerator == null || mapGenerator.ElevationData == null)
         {
             Debug.LogError("PathfindingAStar: MapGeneratorV2 or ElevationData not set!");
