@@ -115,7 +115,14 @@ public class MonsterAI : MonoBehaviour
 
     void RequestNewPath()
             {
-                if (pathfinder == null || playerTransform == null || playerMovementScript == null) return;
+
+                // verifier si il n'est pas sur un escalier (sinon ça bug)
+            if (mapGenerator.stairsLayer.GetTile(currentLogicalTile) == mapGenerator.stair_S_Tile)
+            {
+                // Optionnel: Debug.Log($"Monster {gameObject.name} is on a stair ({currentLogicalTile}), skipping path request.");
+                return; // Ne pas chercher de nouveau chemin si sur un escalier
+            }
+                if (pathfinder == null || playerTransform == null || playerMovementScript == null ) return;
 
                 Vector3Int playerTile = mapGenerator.groundLayer.WorldToCell(playerTransform.position);
                 int playerElevation = playerMovementScript.GetCurrentElevation();
