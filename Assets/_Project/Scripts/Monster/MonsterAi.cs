@@ -32,6 +32,9 @@ public class MonsterAI : MonoBehaviour
     [Header("Attack Settings")]
     public float attackRange = 1.5f; // En unités de monde, ou en nombre de tuiles
     public float attackCooldown = 2.0f;
+     public int attackDamage = 5; // NOUVELLE LIGNE: Dégâts du monstre
+    public GameObject attackEffectPrefab; // NOUVELLE LIGNE: Assignez le prefab de particules ici
+    public float attackEffectDuration = 1.0f; // NOUVELLE LIGNE: Durée avant de détruire l'effet
     private float attackTimer;
     // Ajoutez des stats de monstre ici (PV, dégâts, etc.)
 
