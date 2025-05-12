@@ -2440,6 +2440,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1089949087}
     - target: {fileID: 4988048086440501817, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
+      propertyPath: attackEffectPrefab
+      value: 
+      objectReference: {fileID: 7920635734472109074, guid: 074b96eb437287c41ba6ec883bbdd7e1, type: 3}
+    - target: {fileID: 4988048086440501817, guid: 13c94bc0d626c7d46a69f24dc2e55cc6, type: 3}
       propertyPath: playerMovementScript
       value: 
       objectReference: {fileID: 1089949084}
