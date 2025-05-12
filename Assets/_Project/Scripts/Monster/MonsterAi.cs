@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections; // Pour les Coroutines
+using UnityEngine.Tilemaps; // <--- AJOUTEZ CETTE LIGNE !
 
 public class MonsterAI : MonoBehaviour
 {
@@ -24,6 +25,9 @@ public class MonsterAI : MonoBehaviour
     [Header("Pathfinding Settings")]
     public float pathRefreshRate = 0.1f; // Recalculer le chemin toutes les X secondes
     private float pathRefreshTimer;
+    private bool justCompletedStairTransition = false;
+    private const float postStairPathDelay = 0.5f; // Small delay before allowing path recalc after stairs
+    private float postStairPathTimer = 0f;
 
     [Header("Attack Settings")]
     public float attackRange = 1.5f; // En unités de monde, ou en nombre de tuiles
@@ -81,32 +85,56 @@ public class MonsterAI : MonoBehaviour
     }
 
     void Update()
-    {
-        if (playerTransform == null) return; // Joueur mort ou non trouvé
+{
+    if (playerTransform == null) return;
 
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        attackTimer -= Time.deltaTime;
-
-        // 1. Attaquer si à portée et cooldown écoulé
-        if (distanceToPlayer <= attackRange && attackTimer <= 0)
-        {
-            AttackPlayer();
-            // Arrêter le mouvement pendant l'attaque (optionnel)
-            if (isMovingOnPath) StopMovement();
+    float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+    attackTimer -= Time.deltaTime;
+    pathRefreshTimer -= Time.deltaTime;
+    if (justCompletedStairTransition) { // If we are in post-stair delay
+        postStairPathTimer -= Time.deltaTime;
+        if (postStairPathTimer <= 0) {
+            // Debug.Log("[Update] Post-stair delay finished.");
+            justCompletedStairTransition = false; // Delay over
         }
-        // 2. Se déplacer si pas en train d'attaquer (ou si l'attaque n'interrompt pas le mouvement)
-        else if (true) // Si pas en mouvement ou si le chemin est nul (!isMovingOnPath || (isMovingOnPath && currentPath == null))
-        {
-            pathRefreshTimer -= Time.deltaTime;
-            if (pathRefreshTimer <= 0)
-            {
-                RequestNewPath();
-                pathRefreshTimer = pathRefreshRate;
-            }
-        }
-
-        // Gestion du mouvement le long du chemin existant (se fait dans FixedUpdate pour la physique)
     }
+
+
+    // 1. Attack
+    if (distanceToPlayer <= attackRange && attackTimer <= 0)
+    {
+        AttackPlayer();
+        if (isMovingOnPath) StopMovement(); // Stop movement maybe
+         // Reset path timer? Maybe not needed if StopMovement clears path.
+         pathRefreshTimer = pathRefreshRate;
+         justCompletedStairTransition = false; // Attacking resets the state
+    }
+    // 2. Path Recalculation Logic (only if not attacking)
+    else
+    {
+         // Conditions to check for path request:
+         bool isOnStairTile = mapGenerator.stairsLayer.GetTile(currentLogicalTile) == mapGenerator.stair_S_Tile;
+         bool timerReady = pathRefreshTimer <= 0;
+         bool canRequest = timerReady && !isOnStairTile && !justCompletedStairTransition && isMovingOnPath == false; // Request only if timer ready AND not on stair AND not in post-stair delay AND not already moving
+
+         // Let's refine: recalculate if timer ready, not on stair, not in delay. If already moving, the new path will replace old one.
+         canRequest = timerReady && !isOnStairTile && !justCompletedStairTransition;
+
+
+         if (canRequest)
+         {
+            // Debug.Log($"[Update] Requesting new path. Timer:{pathRefreshTimer}, OnStair:{isOnStairTile}, PostStairDelay:{justCompletedStairTransition}");
+            RequestNewPath();
+            pathRefreshTimer = pathRefreshRate; // Reset timer after request
+         }
+         else if (timerReady) {
+             // Timer ready but blocked (on stair or post-transition delay)
+             // Reset timer anyway to prevent immediate re-check next frame
+              pathRefreshTimer = pathRefreshRate;
+            //   Debug.Log($"[Update] Path request timer ready but blocked. OnStair:{isOnStairTile}, PostStairDelay:{justCompletedStairTransition}. Timer reset.");
+         }
+    }
+}
 
     void FixedUpdate()
     {
@@ -119,9 +147,10 @@ public class MonsterAI : MonoBehaviour
                 // verifier si il n'est pas sur un escalier (sinon ça bug)
             if (mapGenerator.stairsLayer.GetTile(currentLogicalTile) == mapGenerator.stair_S_Tile)
             {
-                // Optionnel: Debug.Log($"Monster {gameObject.name} is on a stair ({currentLogicalTile}), skipping path request.");
+                Debug.Log($"Monster {gameObject.name} is on a stair ({currentLogicalTile}), skipping path request.");
                 return; // Ne pas chercher de nouveau chemin si sur un escalier
             }
+            Debug.Log($"Monster {gameObject.name} finding a new path request.");
                 if (pathfinder == null || playerTransform == null || playerMovementScript == null ) return;
 
                 Vector3Int playerTile = mapGenerator.groundLayer.WorldToCell(playerTransform.position);
@@ -148,83 +177,180 @@ public class MonsterAI : MonoBehaviour
                 }
             }
 
-    void HandleMovementOnPath()
+void HandleMovementOnPath()
+{
+    if (!isMovingOnPath || currentPath == null || currentPathIndex >= currentPath.Count)
+    {
+        // If we were supposed to be moving but something is wrong (e.g., path became null), stop.
+        if (isMovingOnPath)
         {
-            if (!isMovingOnPath || currentPath == null || currentPathIndex >= currentPath.Count)
+            // Debug.Log("[HandleMovement] Stopping movement because path is null or index out of bounds.");
+            StopMovement();
+        }
+        return; // Nothing to do if not moving on a valid path/index
+    }
+
+    // --- Target Calculation ---
+    Vector3Int targetTileInPath = currentPath[currentPathIndex];
+    Vector3 targetWorldPosition = mapGenerator.groundLayer.GetCellCenterWorld(targetTileInPath);
+
+    // --- Movement Execution ---
+    Vector3 direction = (targetWorldPosition - transform.position).normalized;
+    // Prevent NaN issues if somehow target is exactly the current position (shouldn't happen with < 0.1f check below)
+    if (direction == Vector3.zero && Vector3.Distance(transform.position, targetWorldPosition) < 0.1f) {
+        // Already at target, skip movement physics/animator update for this frame before the check below handles it.
+    } else if (direction != Vector3.zero) {
+         Vector3 newPosition = Vector3.MoveTowards(transform.position, targetWorldPosition, moveSpeed * Time.fixedDeltaTime);
+         GetComponent<Rigidbody2D>().MovePosition(newPosition);
+         UpdateAnimator(direction); // Update animation based on movement direction
+    } else {
+        // Target is same as current, but distance > 0.1f? Weird state, update animator to idle
+        UpdateAnimator(Vector2.zero);
+    }
+
+
+    // --- Check if target tile is reached ---
+    if (Vector3.Distance(transform.position, targetWorldPosition) < 0.1f)
+    {
+        // Snap to the exact center of the tile
+        transform.position = targetWorldPosition;
+
+        // --- State Update Preparation ---
+        Vector3Int previousLogicalTile = currentLogicalTile; // Store where we came FROM
+        int previousElevation = currentMonsterElevation;     // Store elevation BEFORE the move
+
+        // Identify the tile we just landed on and the one we came from (specifically checking stair tiles)
+        TileBase tileOnCurrentStairsLayer = mapGenerator.stairsLayer.GetTile(targetTileInPath); // Tile we just landed on
+        bool justArrivedOnStairSTile = (tileOnCurrentStairsLayer == mapGenerator.stair_S_Tile);
+
+        TileBase tileOnPreviousStairsLayer = mapGenerator.stairsLayer.GetTile(previousLogicalTile); // Tile we came from
+        bool cameFromStairSTile = (tileOnPreviousStairsLayer == mapGenerator.stair_S_Tile);
+
+        int newElevation = previousElevation; // Default: assume elevation doesn't change
+        bool didMoveOffStair = false; // Flag specifically for the transition OFF a stair
+
+        // --- Elevation Update Logic ---
+
+        // Case 1: Just landed ON the special stair tile
+        if (justArrivedOnStairSTile)
+        {
+            Vector3Int expectedL0Access = new Vector3Int(targetTileInPath.x, targetTileInPath.y - 1, 0); // Tile south of stair (L0 access)
+            Vector3Int expectedL1Access = new Vector3Int(targetTileInPath.x, targetTileInPath.y + 1, 0); // Tile north of stair (L1 access/platform)
+
+            if (previousLogicalTile == expectedL0Access && previousElevation == 0)
             {
-                if (isMovingOnPath) StopMovement();
-                return;
+                // Came from L0 South onto L1 Data stair -> Effectively mid-transition UPWARDS
+                newElevation = 1; // Represents being 'on' the L1 part of the transition conceptually
+                // Debug.Log($"[HandleMovement] Arrived ON Stair {targetTileInPath} from L0 South ({previousLogicalTile}). Temp Elev = 1");
             }
-
-            Vector3Int targetTileInPath = currentPath[currentPathIndex];
-            Vector3 targetWorldPosition = mapGenerator.groundLayer.GetCellCenterWorld(targetTileInPath);
-            
-            // Déterminer l'élévation où le monstre sera après ce pas.
-            // La logique de FindOverallPath et IsMonsterMoveValid devrait déjà avoir planifié cela.
-            // On peut essayer de la déduire pour mettre à jour currentMonsterElevation correctement.
-            int nextStepElevation = currentMonsterElevation; // Supposition initiale
-            
-            // Si on est sur une tuile qui est une entrée/sortie d'escalier connue,
-            // et que la tuile suivante du chemin est de l'autre côté de cet escalier,
-            // alors l'élévation change.
-            // Cette logique est complexe à déduire ici sans avoir les PathNodes complets.
-            // Pour l'instant, on va se fier à l'ElevationData de la tuile cible,
-            // en espérant que le pathfinding a correctement géré les transitions d'escalier.
-            // Une solution plus robuste serait que FindOverallPath retourne des PathNodes avec l'élévation prévue.
-            if (mapGenerator.IsTileWithinBounds(targetTileInPath.x, targetTileInPath.y))
+            else if (previousLogicalTile == expectedL1Access && previousElevation == 1)
             {
-                int targetDataElevation = mapGenerator.ElevationData[targetTileInPath.x, targetTileInPath.y];
-                bool targetIsStair = mapGenerator.stairsLayer.GetTile(targetTileInPath) != null;
-                bool targetIsBridge = mapGenerator.bridgeLayer.GetTile(targetTileInPath) != null;
-
-                // Logique simplifiée pour la mise à jour de l'élévation du monstre pendant le mouvement
-                if (targetIsStair) { // Si la cible est une tuile d'escalier
-                    // On est monté si on était L0 et l'escalier L0 mène à L1
-                    // Ou on est descendu si on était L1 sur plateforme et l'escalier L0 est la cible
-                    // Cela a dû être validé par IsMonsterMoveValid.
-                    // On prend l'ElevationData comme indicateur brut, mais ce n'est pas parfait.
-                    // Exemple: si currentMonsterElevation est 0 et on va sur un escalier (data 0) qui monte à L1,
-                    // alors nextStepElevation devrait devenir 1.
-                    // Pour une logique plus simple ici, on va se fier à IsMonsterMoveValid du pathfinder
-                    // qui aurait dû déterminer la targetMonsterActualElevation
-                    // Pour l'instant, on va prendre l'elevation data de la tuile, et ajuster pour les ponts.
-                    nextStepElevation = targetDataElevation;
-                    if (targetIsBridge && targetDataElevation == 1) nextStepElevation = 1; // Sur un pont, c'est L1
-                    else if (targetIsBridge && targetDataElevation == 0) nextStepElevation = 0; // Devrait pas arriver, mais pour être sûr sous un pont L0
-                    // La logique d'escalier dans IsMonsterMoveValid du pathfinder est la clé pour le *calcul* du chemin.
-                    // Ici, on essaie de *refléter* ce changement.
-                } else if (targetIsBridge) {
-                    nextStepElevation = 1; // Si on est sur un pont, on est à L1
-                } else {
-                    nextStepElevation = targetDataElevation; // Sol normal
-                }
+                // Came from L1 North onto L1 Data stair -> Effectively mid-transition DOWNWARDS
+                newElevation = 0; // Represents being 'on' the L0 part of the transition conceptually
+                // Debug.Log($"[HandleMovement] Arrived ON Stair {targetTileInPath} from L1 North ({previousLogicalTile}). Temp Elev = 0");
             }
-
-
-            Vector3 direction = (targetWorldPosition - transform.position).normalized;
-            Vector3 newPosition = Vector3.MoveTowards(transform.position, targetWorldPosition, moveSpeed * Time.fixedDeltaTime);
-            GetComponent<Rigidbody2D>().MovePosition(newPosition);
-            UpdateAnimator(direction);
-
-            if (Vector3.Distance(transform.position, targetWorldPosition) < 0.1f)
+            else
             {
-                transform.position = targetWorldPosition;
-                currentLogicalTile = targetTileInPath;
-                currentMonsterElevation = nextStepElevation; // MISE A JOUR IMPORTANTE
-                currentPathIndex++;
-                if (currentPathIndex >= currentPath.Count)
-                {
-                    StopMovement();
-                }
+                // Arrived on stair tile from somewhere unexpected (e.g., side, multi-tile stair?). Fallback.
+                // Since stair_S_Tile itself has L1 data, use that.
+                newElevation = 1;
+                // Debug.LogWarning($"[HandleMovement] Arrived ON Stair {targetTileInPath} from unexpected tile {previousLogicalTile} (Elev {previousElevation}). Assuming New Elevation = 1 (Stair Data)");
+            }
+             // Clear the post-stair delay flag if we somehow moved back onto a stair
+             justCompletedStairTransition = false;
+             postStairPathTimer = 0f;
+        }
+        // Case 2: Just moved OFF the special stair tile
+        else if (cameFromStairSTile)
+        {
+             didMoveOffStair = true; // Mark that this step completed the stair traversal
+
+             Vector3Int expectedL0Exit = new Vector3Int(previousLogicalTile.x, previousLogicalTile.y - 1, 0); // Tile south of the stair we left
+             Vector3Int expectedL1Exit = new Vector3Int(previousLogicalTile.x, previousLogicalTile.y + 1, 0); // Tile north of the stair we left
+
+            if (targetTileInPath == expectedL0Exit) {
+                // Moved South off the stair onto expected L0 ground
+                newElevation = 0;
+                // Debug.Log($"[HandleMovement] Moved OFF Stair {previousLogicalTile} to L0 South ({targetTileInPath}). Final Elevation = 0");
+            }
+            else if (targetTileInPath == expectedL1Exit) {
+                 // Moved North off the stair onto expected L1 platform/bridge
+                newElevation = 1;
+                // Debug.Log($"[HandleMovement] Moved OFF Stair {previousLogicalTile} to L1 North ({targetTileInPath}). Final Elevation = 1");
+            } else {
+                // Moved off the stair tile to an unexpected adjacent tile. Fallback to target tile's data.
+                if (mapGenerator.IsTileWithinBounds(targetTileInPath.x, targetTileInPath.y)) {
+                     bool targetIsBridge = mapGenerator.bridgeLayer != null && mapGenerator.bridgeLayer.GetTile(targetTileInPath) != null;
+                     newElevation = targetIsBridge ? 1 : mapGenerator.ElevationData[targetTileInPath.x, targetTileInPath.y];
+                     // Debug.LogWarning($"[HandleMovement] Moved OFF Stair {previousLogicalTile} to unexpected tile {targetTileInPath}. Using target Data Elev (Bridge={targetIsBridge}): {newElevation}");
+                 } else {
+                     newElevation = 0; // Default if somehow moved out of bounds
+                    // Debug.LogError($"[HandleMovement] Moved OFF Stair {previousLogicalTile} to OUT OF BOUNDS tile {targetTileInPath}!");
+                 }
             }
         }
+        // Case 3: Normal movement (not involving stepping onto or off the stair_S_Tile in this specific step)
+        else
+        {
+            if (mapGenerator.IsTileWithinBounds(targetTileInPath.x, targetTileInPath.y))
+            {
+                bool targetIsBridge = mapGenerator.bridgeLayer != null && mapGenerator.bridgeLayer.GetTile(targetTileInPath) != null;
+                if (targetIsBridge) {
+                    newElevation = 1; // Landed on a bridge tile -> Elevation is 1
+                } else {
+                    // Landed on ground/platform (non-bridge, non-stair_S) -> Use ElevationData
+                    newElevation = mapGenerator.ElevationData[targetTileInPath.x, targetTileInPath.y];
+                }
+                // Debug.Log($"[HandleMovement] Normal move to {targetTileInPath}. DataElev={mapGenerator.ElevationData[targetTileInPath.x, targetTileInPath.y]}, Bridge={targetIsBridge}. Final Elevation = {newElevation}");
+            }
+            else
+            {
+                newElevation = 0; // Default if somehow moved out of bounds
+                // Debug.LogError($"[HandleMovement] Moved to OUT OF BOUNDS tile {targetTileInPath} during normal movement!");
+            }
+             // Note: The justCompletedStairTransition flag is handled by the timer in Update(),
+             // no need to clear it during normal movement here.
+        }
 
-    void StopMovement()
+        // --- Update Monster State ---
+        currentLogicalTile = targetTileInPath;        // Update the monster's current tile position
+        currentMonsterElevation = newElevation;       // Update the monster's elevation
+
+        // Debug.Log($"[HandleMovement] Step Complete. Current Tile: {currentLogicalTile}, Current Elevation: {currentMonsterElevation}");
+
+        // --- Handle Post-Stair Transition Delay ---
+        if (didMoveOffStair)
+        {
+             // Just completed the step moving OFF the stair.
+             // Set the flag and start the delay timer to prevent immediate path recalculation.
+             // Debug.Log("[HandleMovement] ** Just moved OFF stair. Setting transition flag and starting delay timer. **");
+             justCompletedStairTransition = true;
+             postStairPathTimer = postStairPathDelay; // Start the delay timer
+        }
+
+        // --- Advance Path Index ---
+        currentPathIndex++;
+
+        // --- Check Path Completion ---
+        if (currentPathIndex >= currentPath.Count)
+        {
+            // Debug.Log("[HandleMovement] Path Complete.");
+            StopMovement(); // Stop movement and clear path/flags
+        }
+    }
+    // Else: Target tile not reached yet, continue moving towards it in the next FixedUpdate frame.
+}    void StopMovement()
     {
         isMovingOnPath = false;
         currentPath = null;
         currentPathIndex = 0;
         UpdateAnimator(Vector2.zero); // Animation d'idle
+
+        // --- ADD THIS ---
+        justCompletedStairTransition = false; // Clear transition state on stop
+        postStairPathTimer = 0f;
+        // --- END ADD ---
+
         // Debug.Log($"Monster {gameObject.name}: Movement stopped.");
     }
 

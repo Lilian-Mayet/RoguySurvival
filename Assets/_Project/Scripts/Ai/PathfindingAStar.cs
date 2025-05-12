@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Tilemaps; // <--- AJOUTEZ CETTE LIGNE !
+using UnityEngine.Tilemaps; 
 public class PathfindingAStar : MonoBehaviour
 {
     public MapGeneratorV2 mapGenerator;
@@ -88,41 +88,83 @@ public class PathfindingAStar : MonoBehaviour
             }
             
             // Combiner les chemins
-            List<Vector3Int> combinedPath = new List<Vector3Int>(pathToStairAccess);
-            
-            // La "traversée" de l'escalier est le passage de bestStairTarget.accessPointToReach
-            // à bestStairTarget.exitPointAfter.
-            // On ajoute le point de sortie de l'escalier comme prochain pas si ce n'est pas déjà la fin du chemin d'accès
-            // et si le chemin depuis la sortie n'est pas vide et ne commence pas déjà par ce point.
-            if (combinedPath.Last() == bestStairTarget.accessPointToReach) {
-                if (pathFromStairExit.Count > 0) {
-                    if (pathFromStairExit.First() == bestStairTarget.exitPointAfter) {
-                        combinedPath.AddRange(pathFromStairExit); // pathFromStairExit inclut déjà exitPointAfter
-                    } else {
-                        // Cas étrange, on ajoute quand même, pourrait créer un "saut"
-                        combinedPath.Add(bestStairTarget.exitPointAfter);
-                        combinedPath.AddRange(pathFromStairExit);
-                    }
-                } else { // pathFromStairExit est vide, signifie que le joueur est sur exitPointAfter
-                     combinedPath.Add(bestStairTarget.exitPointAfter);
+            List<Vector3Int> combinedPath = new List<Vector3Int>();
+
+            // 1. Add path to the access point
+            if (pathToStairAccess != null && pathToStairAccess.Count > 0)
+            {
+                combinedPath.AddRange(pathToStairAccess);
+                // Ensure the last step is indeed the access point
+                if (combinedPath.Last() != bestStairTarget.accessPointToReach)
+                {
+                    Debug.LogWarning($"[FindOverallPath] Path to stair access point did not end exactly on it. Expected: {bestStairTarget.accessPointToReach}, Got: {combinedPath.Last()}. Adding access point.");
+                    // Force add the access point if it's missing, though this might indicate a deeper pathfinding issue.
+                    // Make sure we don't add it if it's already the last element.
+                    if(combinedPath.Count == 0 || combinedPath.Last() != bestStairTarget.accessPointToReach)
+                        combinedPath.Add(bestStairTarget.accessPointToReach);
                 }
-            } else {
-                 // Le chemin vers l'escalier ne s'est pas terminé sur le point d'accès attendu.
-                 // On ajoute quand même, mais il pourrait y avoir un saut.
-                 combinedPath.Add(bestStairTarget.exitPointAfter);
-                 combinedPath.AddRange(pathFromStairExit);
             }
-            
-            // Optionnel: Nettoyer les doublons consécutifs au cas où
+            else
+            {
+                 Debug.LogError("[FindOverallPath] Path to stair access point is null or empty!");
+                 return null; // Cannot proceed
+            }
+
+
+            // 2. Add the stair tile itself as the next step
+            //    Check if it's not already the last step (unlikely but possible if path is just the start point)
+            if (combinedPath.Last() != bestStairTarget.stairTilePos)
+            {
+                 combinedPath.Add(bestStairTarget.stairTilePos);
+                 // Debug.Log($"[FindOverallPath] Added stair tile step: {bestStairTarget.stairTilePos}");
+            }
+
+
+            // 3. Add the exit point from the stair
+            //    Check if it's not already the last step (e.g., if stairTilePos IS the exit point - shouldn't happen with S tile)
+            if (combinedPath.Last() != bestStairTarget.exitPointAfter)
+            {
+                combinedPath.Add(bestStairTarget.exitPointAfter);
+                // Debug.Log($"[FindOverallPath] Added stair exit step: {bestStairTarget.exitPointAfter}");
+            }
+
+
+            // 4. Add the path from the stair exit to the player
+            if (pathFromStairExit != null && pathFromStairExit.Count > 0)
+            {
+                // The pathFromStairExit *should* start with exitPointAfter.
+                // We've already added exitPointAfter, so skip the first element of pathFromStairExit if it matches.
+                int startIndex = 0;
+                if (pathFromStairExit[0] == bestStairTarget.exitPointAfter)
+                {
+                    startIndex = 1;
+                } else {
+                     Debug.LogWarning($"[FindOverallPath] Path from stair exit {bestStairTarget.exitPointAfter} did not start with the exit point. First step: {pathFromStairExit[0]}. Adding full path.");
+                }
+
+                for (int i = startIndex; i < pathFromStairExit.Count; i++)
+                {
+                     // Avoid adding duplicates if pathFromStairExit only contained the exit point
+                     if (combinedPath.Last() != pathFromStairExit[i]) {
+                          combinedPath.Add(pathFromStairExit[i]);
+                     }
+                }
+                 // Debug.Log($"[FindOverallPath] Added path from exit. Length: {pathFromStairExit.Count - startIndex}");
+            }
+            // else: pathFromStairExit was null or empty, meaning player was likely on the exit point. Path is complete.
+
+
+            // Optionnel: Nettoyer les doublons consécutifs (Safer final check)
             if (combinedPath.Count > 1) {
                 for (int i = combinedPath.Count - 1; i > 0; i--) {
                     if (combinedPath[i] == combinedPath[i-1]) {
+                        // Debug.Log($"[FindOverallPath] Removing duplicate step: {combinedPath[i]} at index {i}");
                         combinedPath.RemoveAt(i);
                     }
                 }
             }
 
-            // Debug.Log($"[FindOverallPath] Combined path length: {combinedPath.Count}");
+            // Debug.Log($"[FindOverallPath] Final Combined path length: {combinedPath.Count}. Path: {string.Join(" -> ", combinedPath)}");
             return combinedPath;
         }
     }
@@ -146,7 +188,7 @@ public class PathfindingAStar : MonoBehaviour
 
                 if (tileOnStairLayer == mapGenerator.stair_S_Tile) // C'est un stair_S_Tile
                 {
-                    
+                    if (mapGenerator.ElevationData[potentialStairTilePos.x, potentialStairTilePos.y] == 1) continue; // On s'attend à ce que la tuile d'escalier soit L1 data
 
                     Vector3Int accessPointForThisStair = Vector3Int.zero;
                     Vector3Int exitPointFromThisStair = Vector3Int.zero;
@@ -602,6 +644,7 @@ private bool IsMonsterMoveValid(Vector2Int currentMonsterGridPos, int currentMon
     }
     return null;
 }
+
 
 
     private PathNode CreateNodeFromWorldTile(Vector3Int worldTile, int monsterElevationOnThisTile) {
