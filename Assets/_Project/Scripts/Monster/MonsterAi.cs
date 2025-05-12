@@ -38,6 +38,7 @@ public class MonsterAI : MonoBehaviour
     private float attackTimer;
     // Ajoutez des stats de monstre ici (PV, dégâts, etc.)
 
+    private PlayerStats playerStats; // Référence au script PlayerStats
     private Vector2 lastMovementDirectionForAnim;
 
 
@@ -48,13 +49,18 @@ public class MonsterAI : MonoBehaviour
         // Trouver le PathfindingAStar s'il n'est pas assigné (s'il est sur un objet manager)
         if (pathfinder == null) pathfinder = FindFirstObjectByType<PathfindingAStar>();
         // Trouver le joueur s'il n'est pas assigné
-        if (playerTransform == null)
+         if (playerTransform == null)
         {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player"); // Assurez-vous que votre joueur a le tag "Player"
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null) {
                 playerTransform = playerObj.transform;
                 playerMovementScript = playerObj.GetComponent<PlayerMovement>();
+                playerStats = playerObj.GetComponent<PlayerStats>(); // ---> AJOUT: Récupérer PlayerStats
             }
+        } else {
+             // Si playerTransform est assigné, récupérer les scripts
+             playerMovementScript = playerTransform.GetComponent<PlayerMovement>();
+             playerStats = playerTransform.GetComponent<PlayerStats>(); // ---> AJOUT: Récupérer PlayerStats
         }
         if (mapGenerator == null){
             
@@ -359,13 +365,41 @@ void HandleMovementOnPath()
 
     void AttackPlayer()
     {
-        Debug.Log($"Monster {gameObject.name} attacks player!");
-        // Ici, vous mettriez la logique d'attaque (animation, dégâts au joueur, etc.)
-        // Par exemple: playerTransform.GetComponent<PlayerStats>().TakeDamage(10);
-        attackTimer = attackCooldown; // Réinitialiser le cooldown
-        // Orienter le monstre vers le joueur pendant l'attaque
+        // 1. Orienter vers le joueur
         Vector2 directionToPlayer = (playerTransform.position - transform.position).normalized;
-        UpdateAnimator(directionToPlayer); // Pour l'orientation, puis passer à l'anim d'attaque
+        UpdateAnimator(directionToPlayer); // Orienter pour l'attaque (pourrait être une anim spécifique plus tard)
+        // Mettre IsMoving à false pour l'animation d'attaque ou d'idle orienté
+        if (animator != null) animator.SetBool("IsMoving", false);
+
+
+        // 2. Jouer l'effet visuel
+        if (attackEffectPrefab != null)
+        {
+            // Instancier l'effet à la position du monstre
+            GameObject effectInstance = Instantiate(attackEffectPrefab, transform.position, Quaternion.identity);
+            // Détruire l'effet après une courte durée
+            Destroy(effectInstance, attackEffectDuration); // Utilise la variable de durée
+        } else {
+             Debug.Log($"Monster {gameObject.name} attacks player! (No visual effect prefab assigned)");
+        }
+
+        // 3. Infliger les dégâts au joueur
+        if (playerStats != null)
+        {
+            //Debug.Log($"Dealing {attackDamage} damage to player.");
+            playerStats.TakeDamage(attackDamage);
+        } else {
+            Debug.LogError("Monster cannot attack: PlayerStats reference is missing!");
+        }
+
+        // 4. Réinitialiser le cooldown d'attaque
+        attackTimer = attackCooldown;
+
+        // 5. Optionnel: Arrêter le mouvement si l'attaque doit l'interrompre
+         if (isMovingOnPath) {
+            // Debug.Log("Attack interrupting movement.");
+            StopMovement(); // S'arrête complètement pendant le cooldown
+        }
     }
 
 
