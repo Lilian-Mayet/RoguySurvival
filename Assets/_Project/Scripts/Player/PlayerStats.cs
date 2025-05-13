@@ -334,17 +334,7 @@ public class PlayerStats : MonoBehaviour
                 Heal(2);
             }
         
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            if (monsterPrefab != null && mapGenerator != null && playerMovement != null)
-            {
-                SpawnMonsterNearPlayer();
-            }
-            else
-            {
-                Debug.LogWarning("Cannot spawn monster: Prefab, MapGenerator, or PlayerMovement not set.");
-            }
-        }
+       
 
 
 }

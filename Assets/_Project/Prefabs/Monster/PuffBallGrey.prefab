@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8910561352477239485}
   - component: {fileID: 4988048086440501817}
   m_Layer: 0
-  m_Name: Monster
+  m_Name: PuffBallGrey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
