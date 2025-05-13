@@ -161,5 +161,5 @@ MonoBehaviour:
   attackRange: 1.5
   attackCooldown: 2
   attackDamage: 5
-  attackEffectPrefab: {fileID: 0}
+  attackEffectPrefab: {fileID: 7123391276543684259, guid: 65cc663da89c863408a7d7709dd9aea2, type: 3}
   attackEffectDuration: 1

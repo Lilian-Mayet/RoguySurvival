@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 921305314847430394}
   - component: {fileID: 9087603545528087121}
   m_Layer: 0
-  m_Name: PuffBallAttackEffect
+  m_Name: PuffBallGreyAttackEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
